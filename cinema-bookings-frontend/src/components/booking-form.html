@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Form</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+    <div class="booking-form">
+        <h2>Booking Form</h2>
+        <form id="bookingForm">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone:</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="movie">Select Movie:</label>
+                <select id="movie" name="movie" required>
+                    <option value="">--Select a Movie--</option>
+                    <option value="movie1">Movie 1</option>
+                    <option value="movie2">Movie 2</option>
+                    <option value="movie3">Movie 3</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="showtime">Select Showtime:</label>
+                <select id="showtime" name="showtime" required>
+                    <option value="">--Select a Showtime--</option>
+                    <option value="time1">Time 1</option>
+                    <option value="time2">Time 2</option>
+                    <option value="time3">Time 3</option>
+                </select>
+            </div>
+            <button type="submit">Book Now</button>
+        </form>
+    </div>
+</body>
+</html>

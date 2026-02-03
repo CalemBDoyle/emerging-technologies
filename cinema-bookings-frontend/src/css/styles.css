@@ -1,0 +1,129 @@
+:root{
+  --bg-1: #f5f7fb;
+  --bg-2: #eef2f7;
+  --surface: #ffffff;
+  --muted: #6b7280;
+  --text: #0b1220;
+  --accent: #ef6c00;
+  --accent-2: #ffb86b;
+  --glass: rgba(255,255,255,0.6);
+  --card-shadow: 0 8px 28px rgba(11,18,32,0.07);
+  --radius: 10px;
+  --max-width: 1200px;
+}
+
+/* reset / base */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg,var(--bg-1),var(--bg-2));
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.45;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* layout container used throughout pages */
+.container{
+  width:100%;
+  max-width:var(--max-width);
+  margin:0 auto;
+  padding:28px;
+}
+
+/* small helpers */
+.hint{color:var(--muted);font-size:.95rem}
+.kicker{font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+
+/* utility spacing */
+.mt-8{margin-top:8px}
+.mt-12{margin-top:12px}
+.mb-8{margin-bottom:8px}
+.flex{display:flex}
+.center{display:flex;align-items:center;justify-content:center}
+
+/* responsive images */
+img{max-width:100%;display:block}
+
+/* accessible focus */
+:focus{outline:3px solid rgba(239,108,0,0.15);outline-offset:2px;border-radius:6px}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+footer {
+    background: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+h1, h2, h3 {
+    margin: 10px 0;
+}
+
+a {
+    color: #fff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.movie-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin: 10px;
+    padding: 15px;
+    text-align: center;
+}
+
+.seat-map {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.seat {
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+    background: #28a745;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.seat.selected {
+    background: #ffc107;
+}
+
+.seat.occupied {
+    background: #dc3545;
+    cursor: not-allowed;
+}
