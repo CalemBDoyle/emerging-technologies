@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Locations — Cinema Bookings</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    #map { height: 64vh; border-radius:12px; box-shadow: var(--card-shadow); border:1px solid rgba(11,18,32,0.04); }
+    .leaflet-popup-content .btn { margin-top:8px; display:inline-block; }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+
+  <main class="container" style="padding-top:28px">
+    <section class="card">
+      <h2 style="margin:0">Cinema locations — Dublin</h2>
+      <p class="hint mt-8">Click a marker to view the cinema and its movies.</p>
+      <div id="map" class="mt-12"></div>
+    </section>
+
+    <section class="card mt-12">
+      <h3>List</h3>
+      <div id="locations-list" class="mt-8"></div>
+    </section>
+  </main>
+
+  <div id="footer"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="../js/locations.js"></script>
+</body>
+</html>

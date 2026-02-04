@@ -213,11 +213,33 @@ a, .btn-primary {
 
 /* small visual showtime row */
 .showtimes{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+/* Clear, high‑contrast showtime pills */
 .showtime{
-  padding:6px 8px;border-radius:8px;background:linear-gradient(90deg,var(--accent-2, #ffb86b),var(--accent));
-  color:#fff;font-weight:700;font-size:.9rem;
-  box-shadow:0 6px 14px rgba(239,108,0,0.08)
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:8px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2, #ffb86b));
+  color: #ffffff;
+  font-weight:700;
+  font-size:.92rem;
+  box-shadow: 0 6px 14px rgba(239,108,0,0.12);
+  text-shadow: 0 1px 0 rgba(0,0,0,0.12);
+  border: none;
+  cursor: pointer;
+  user-select: none;
 }
+
+/* disabled / taken style */
+.showtime[aria-pressed="true"],
+.showtime.taken {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ensure links or other rules don't override color */
+.showtimes .showtime,
+.showtime { color: #fff !important; }
 
 /* responsive tweaks */
 @media (max-width:720px){

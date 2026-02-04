@@ -96,3 +96,46 @@
   .movie-card .poster img{height:140px}
   .btn{padding:9px 12px;font-size:.92rem}
 }
+
+/* Header/auth styles */
+.auth-header .header-inner{display:flex;align-items:center;gap:16px;justify-content:space-between}
+.auth-area{display:flex;gap:8px;align-items:center}
+.profile{display:flex;gap:8px;align-items:center}
+.avatar{
+  width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;display:inline-flex;align-items:center;justify-content:center;font-weight:700;
+}
+.username{font-weight:600;margin-right:8px}
+
+/* stylized cinema card */
+.cinema-overview.stylized{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px;border-radius:12px;
+  transition:transform .16s ease, box-shadow .16s ease;
+  border:1px solid rgba(11,18,32,0.04);
+}
+.cinema-overview.stylized:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(11,18,32,0.06)}
+.brand-row{display:flex;gap:12px;align-items:center}
+.logo-sm{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.05rem}
+.cinema-title{margin:0;font-size:1.05rem}
+.cinema-desc{color:var(--muted);margin-top:8px}
+
+/* auth card and forms */
+.auth-card{max-width:640px;margin:0 auto;padding:20px;border-radius:12px}
+.auth-form .form-row{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.input{padding:10px 12px;border-radius:8px;border:1px solid rgba(11,18,32,0.06);background:linear-gradient(180deg,#fff,#fbfcfe);font-size:.95rem}
+
+/* small button variant */
+.btn.small{padding:8px 10px;font-size:.88rem}
+
+/* quick visual polish for links in auth area */
+a.btn-ghost.small{border:1px solid rgba(11,18,32,0.04);background:transparent}
+
+/* seat selection improvements (existing seat class used by booking flow) */
+.seat{min-width:44px;min-height:38px;border-radius:8px;border:1px solid rgba(11,18,32,0.06);background:#fff;cursor:pointer}
+.seat.taken{opacity:.36;cursor:not-allowed}
+.seat.selected{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border-color:rgba(0,0,0,0.06)}
+
+/* small responsive tweaks */
+@media (max-width:720px){
+  .cinema-overview.stylized{flex-direction:column;align-items:flex-start}
+  .logo-sm{width:48px;height:48px}
+}

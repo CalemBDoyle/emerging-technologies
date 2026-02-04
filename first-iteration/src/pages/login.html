@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login — Cinema Bookings</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container" style="max-width:520px;margin-top:48px">
+    <section class="card auth-card">
+      <h2>Welcome back</h2>
+      <p class="hint">Log in to manage bookings and quickly book seats.</p>
+
+      <form id="login-form" class="auth-form" autocomplete="on">
+        <div class="form-row">
+          <label>Email</label>
+          <input id="email" class="input" type="email" required />
+        </div>
+        <div class="form-row">
+          <label>Password</label>
+          <input id="password" class="input" type="password" required />
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+          <button type="submit" class="btn btn-primary">Log in</button>
+          <a class="btn btn-ghost" href="register.html">Create account</a>
+        </div>
+
+        <div id="login-msg" class="hint mt-8" aria-live="polite"></div>
+      </form>
+    </section>
+  </main>
+  <div id="footer"></div>
+
+  <script type="module">
+    import { loginUser } from '../js/auth.js';
+
+    const form = document.getElementById('login-form');
+    const msg = document.getElementById('login-msg');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const res = loginUser(email, password);
+      if (!res.success) {
+        msg.textContent = res.message;
+        return;
+      }
+
+      // if there is a pending booking saved earlier, restore and go to booking
+      const pending = sessionStorage.getItem('pendingBooking');
+      if (pending) {
+        const p = JSON.parse(pending);
+        // store selections that booking.js expects
+        if (p.cinemaId) sessionStorage.setItem('selectedCinemaId', p.cinemaId);
+        if (p.movieId) sessionStorage.setItem('selectedMovieId', p.movieId);
+        if (p.time) sessionStorage.setItem('selectedShowtime', p.time);
+        // we keep seats in pendingBooking until user confirms; remove pending
+        sessionStorage.removeItem('pendingBooking');
+        window.location.href = '../pages/booking.html';
+        return;
+      }
+
+      // otherwise return to home
+      window.location.href = '../index.html';
+    });
+  </script>
+</body>
+</html>

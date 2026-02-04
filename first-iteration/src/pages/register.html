@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Register — Cinema Bookings</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+</head>
+<body>
+  <div id="header"></div>
+  <main class="container" style="max-width:560px;margin-top:48px">
+    <section class="card auth-card">
+      <h2>Create an account</h2>
+      <p class="hint">Register to save bookings and access fast checkout.</p>
+
+      <form id="register-form" class="auth-form" autocomplete="on">
+        <div class="form-row">
+          <label>Full name</label>
+          <input id="name" class="input" type="text" required />
+        </div>
+        <div class="form-row">
+          <label>Email</label>
+          <input id="email" class="input" type="email" required />
+        </div>
+        <div class="form-row">
+          <label>Password</label>
+          <input id="password" class="input" type="password" minlength="6" required />
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+          <button type="submit" class="btn btn-primary">Create account</button>
+          <a class="btn btn-ghost" href="login.html">Sign in</a>
+        </div>
+
+        <div id="reg-msg" class="hint mt-8" aria-live="polite"></div>
+      </form>
+    </section>
+  </main>
+  <div id="footer"></div>
+
+  <script type="module">
+    import { registerUser } from '../js/auth.js';
+
+    const form = document.getElementById('register-form');
+    const msg = document.getElementById('reg-msg');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const res = registerUser({ name, email, password });
+      if (!res.success) {
+        msg.textContent = res.message;
+        return;
+      }
+      window.location.href = '../index.html';
+    });
+  </script>
+</body>
+</html>
