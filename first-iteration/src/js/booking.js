@@ -4,6 +4,12 @@ import { getCurrentUser } from './auth.js';
 const ROWS = ['A','B','C','D','E','F'];
 const COLS = 8;
 const PRICE_PER_SEAT = 10; // demo price
+const PERSIST_KEY = 'cinemas_state';
+
+function loadTakenMap(){
+  try { return JSON.parse(localStorage.getItem(PERSIST_KEY) || '{}'); } catch { return {}; }
+}
+function saveTakenMap(map){ localStorage.setItem(PERSIST_KEY, JSON.stringify(map)); }
 
 function createSeatButton(id, state){
   const btn = document.createElement('button');
@@ -41,6 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // Merge persisted taken seats into the screening
+  const takenMap = loadTakenMap();
+  const persistedTaken = (((takenMap[cinemaId] || {})[movieId] || {})[time]) || [];
+  screening.taken = Array.from(new Set([...(screening.taken || []), ...persistedTaken]));
+
   // render booking UI
   container.innerHTML = `
     <section class="card">
@@ -69,35 +80,37 @@ document.addEventListener('DOMContentLoaded', () => {
   const takenSet = new Set(screening.taken || []);
 
   // layout: grid with row labels
-  seatMapEl.style.gridTemplateColumns = `repeat(${COLS + 1}, auto)`; // +1 for row label
-  // build rows
-  ROWS.forEach(row => {
-    // row label cell
-    const label = document.createElement('div');
-    label.textContent = row;
-    label.style.alignSelf = 'center';
-    label.style.fontWeight = '700';
-    seatMapEl.appendChild(label);
+  if (seatMapEl) {
+    seatMapEl.style.gridTemplateColumns = `repeat(${COLS + 1}, auto)`; // +1 for row label
+    // build rows
+    ROWS.forEach(row => {
+      // row label cell
+      const label = document.createElement('div');
+      label.textContent = row;
+      label.style.alignSelf = 'center';
+      label.style.fontWeight = '700';
+      seatMapEl.appendChild(label);
 
-    for (let col = 1; col <= COLS; col++){
-      const id = `${row}${col}`;
-      const state = takenSet.has(id) ? 'taken' : 'free';
-      const btn = createSeatButton(id, state);
-      btn.style.margin = '0';
-      btn.addEventListener('click', () => {
-        if (btn.disabled) return;
-        if (selected.has(id)){
-          selected.delete(id);
-          btn.classList.remove('selected');
-        } else {
-          selected.add(id);
-          btn.classList.add('selected');
-        }
-        updateSelectionUI();
-      });
-      seatMapEl.appendChild(btn);
-    }
-  });
+      for (let col = 1; col <= COLS; col++){
+        const id = `${row}${col}`;
+        const state = takenSet.has(id) ? 'taken' : 'free';
+        const btn = createSeatButton(id, state);
+        btn.style.margin = '0';
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          if (selected.has(id)){
+            selected.delete(id);
+            btn.classList.remove('selected');
+          } else {
+            selected.add(id);
+            btn.classList.add('selected');
+          }
+          updateSelectionUI();
+        });
+        seatMapEl.appendChild(btn);
+      }
+    });
+  }
 
   function updateSelectionUI(){
     const countEl = document.getElementById('selected-count');
@@ -108,64 +121,75 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // confirm booking
-  document.getElementById('confirm-booking').addEventListener('click', () => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) {
-      // store pending booking and require login
-      const pending = {
+  const confirmBtn = document.getElementById('confirm-booking');
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', () => {
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        // store pending booking and require login
+        const pending = {
+          cinemaId: cinema.id,
+          movieId: movie.id,
+          time,
+          seats: Array.from(selected)
+        };
+        sessionStorage.setItem('pendingBooking', JSON.stringify(pending));
+        window.location.href = '../pages/login.html';
+        return;
+      }
+
+      if (selected.size === 0) {
+        alert('Select at least one seat to continue.');
+        return;
+      }
+
+      const seats = Array.from(selected);
+
+      // append booking to localStorage, associate with current user
+      const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+      const booking = {
+        id: `bkg-${Date.now()}`,
+        userId: currentUser.id,
+        userName: currentUser.name,
         cinemaId: cinema.id,
+        cinemaName: cinema.name,
         movieId: movie.id,
+        movieTitle: movie.title,
         time,
-        seats: Array.from(selected)
+        seats,
+        total: seats.length * PRICE_PER_SEAT,
+        createdAt: new Date().toISOString()
       };
-      sessionStorage.setItem('pendingBooking', JSON.stringify(pending));
-      window.location.href = '../pages/login.html';
-      return;
-    }
+      bookings.push(booking);
+      localStorage.setItem('bookings', JSON.stringify(bookings));
 
-    if (selected.size === 0) {
-      alert('Select at least one seat to continue.');
-      return;
-    }
+      // persist taken seats so they cannot be booked again
+      const map = loadTakenMap();
+      map[cinema.id] = map[cinema.id] || {};
+      map[cinema.id][movie.id] = map[cinema.id][movie.id] || {};
+      map[cinema.id][movie.id][time] = Array.from(new Set([...(map[cinema.id][movie.id][time] || []), ...seats]));
+      saveTakenMap(map);
 
-    const seats = Array.from(selected);
-    // append booking to localStorage, associate with current user
-    const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-    const booking = {
-      id: `bkg-${Date.now()}`,
-      userId: currentUser.id,
-      userName: currentUser.name,
-      cinemaId: cinema.id,
-      cinemaName: cinema.name,
-      movieId: movie.id,
-      movieTitle: movie.title,
-      time,
-      seats,
-      total: seats.length * PRICE_PER_SEAT,
-      createdAt: new Date().toISOString()
-    };
-    bookings.push(booking);
-    localStorage.setItem('bookings', JSON.stringify(bookings));
+      // mark seats as taken in-memory for this session
+      screening.taken = Array.from(new Set([...(screening.taken || []), ...seats]));
 
-    // mark seats as taken in-memory (demo)
-    screening.taken = Array.from(new Set([...(screening.taken || []), ...seats]));
-
-    // show confirmation (same as before)
-    container.innerHTML = `
-      <section class="card">
-        <h2>Booking confirmed</h2>
-        <p class="small">Thank you — booking saved to your account (demo).</p>
-        <div class="hr"></div>
-        <div class="mt-8"><strong>${movie.title}</strong></div>
-        <div class="small mt-4">${cinema.name} · ${cinema.location}</div>
-        <div class="mt-8">Showtime: <strong>${time}</strong></div>
-        <div class="mt-8">Seats: <strong>${seats.join(', ')}</strong></div>
-        <div class="mt-8">Total: <strong>$${booking.total}</strong></div>
-        <div class="mt-12">
-          <a class="btn btn-primary" href="../index.html">Back to cinemas</a>
-          <a class="btn btn-ghost" href="../pages/cinema.html">Back to movies</a>
-        </div>
-      </section>
-    `;
-  });
-});
+      // show confirmation
+      container.innerHTML = `
+        <section class="card">
+          <h2>Booking confirmed</h2>
+          <p class="small">Thank you — booking saved to your account (demo).</p>
+          <div class="hr"></div>
+          <div class="mt-8"><strong>${movie.title}</strong></div>
+          <div class="small mt-4">${cinema.name} · ${cinema.location}</div>
+          <div class="mt-8">Showtime: <strong>${time}</strong></div>
+          <div class="mt-8">Seats: <strong>${seats.join(', ')}</strong></div>
+          <div class="mt-8">Total: <strong>$${booking.total}</strong></div>
+          <div class="mt-12">
+            <a class="btn btn-primary" href="../index.html">Back to cinemas</a>
+            <a class="btn btn-ghost" href="../pages/cinema.html">Back to movies</a>
+          </div>
+        </section>
+      `;
+    });
+  }
+})

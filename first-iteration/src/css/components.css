@@ -139,3 +139,14 @@ a.btn-ghost.small{border:1px solid rgba(11,18,32,0.04);background:transparent}
   .cinema-overview.stylized{flex-direction:column;align-items:flex-start}
   .logo-sm{width:48px;height:48px}
 }
+
+.showtime.sold-out{
+  background:#eef0f2;
+  color:#6b6b6b;
+  border:1px solid rgba(11,18,32,0.03);
+  cursor:not-allowed;
+  font-weight:700;
+  padding:6px 10px;
+  border-radius:8px;
+  opacity:0.85;
+}

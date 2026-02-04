@@ -1,6 +1,15 @@
 import { cinemas } from './data/cinemas.js';
 
+const ROWS = ['A','B','C','D','E','F'];
+const COLS = 8;
+const PERSIST_KEY = 'cinemas_state';
+
+function loadTakenMap(){
+  try { return JSON.parse(localStorage.getItem(PERSIST_KEY) || '{}'); } catch { return {}; }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  // header + footer rendering (same as before)
   const header = document.getElementById('header');
   if (header) {
     header.innerHTML = `
@@ -31,6 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  const takenMap = loadTakenMap();
+  const capacity = ROWS.length * COLS;
+
   container.innerHTML = `
     <section class="card">
       <div class="cinema-header">
@@ -52,7 +64,13 @@ document.addEventListener('DOMContentLoaded', () => {
           <h3>${m.title}</h3>
           <div class="meta">${m.genre} · ${m.duration}</div>
           <div class="mt-8 showtimes" aria-label="Showtimes">
-            ${m.screenings.map(s => `<button class="showtime btn-ghost btn-book-now" data-movie-id="${m.id}" data-time="${s.time}">${s.time}</button>`).join('')}
+            ${m.screenings.map(s => {
+              const persisted = (((takenMap[cinema.id] || {})[m.id] || {})[s.time]) || [];
+              const soldOut = persisted.length >= capacity;
+              return soldOut
+                ? `<button class="showtime sold-out" disabled>Sold out</button>`
+                : `<button class="showtime btn-ghost btn-book-now" data-movie-id="${m.id}" data-time="${s.time}">${s.time}</button>`;
+            }).join('')}
           </div>
         </article>
       `).join('')}
