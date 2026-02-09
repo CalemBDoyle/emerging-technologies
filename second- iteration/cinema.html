@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinema Finder</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎭 Cinema Finder</h1>
+            <p>Discover cinemas and movies showing near you</p>
+        </header>
+
+        <div class="cinemas-grid" id="cinemas-container"></div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="booking-modal">
+        <div class="booking-content">
+            <button class="close-btn" onclick="closeBooking()">&times;</button>
+            <h2>Book Your Tickets</h2>
+            <div class="booking-details">
+                <p><strong>Cinema:</strong> <span id="bookingCinema"></span></p>
+                <p><strong>Movie:</strong> <span id="bookingMovie"></span></p>
+                <p><strong>Time:</strong> <span id="bookingTime"></span></p>
+            </div>
+            
+            <div class="seats-selection">
+                <h3>Select Seats</h3>
+                <div class="screen">SCREEN</div>
+                <div class="seat-grid" id="seatGrid"></div>
+            </div>
+
+            <div class="booking-summary">
+                <p>Selected Seats: <span id="selectedSeatsDisplay">None</span></p>
+                <p>Total Price: <span id="totalPrice">$0</span></p>
+            </div>
+
+            <button class="confirm-btn" onclick="confirmBooking()">Confirm Booking</button>
+        </div>
+    </div>
+
+    <!-- Movie Details Modal -->
+    <div id="movieModal" class="movie-modal">
+        <div class="movie-modal-content">
+            <button class="close-btn" onclick="closeMovieDetails()">&times;</button>
+            <div class="movie-trailer-container">
+                <iframe id="movieTrailer" class="movie-trailer" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="movie-details-header">
+                <h2 id="movieModalTitle"></h2>
+                <div class="movie-meta">
+                    <span class="movie-badge" id="movieGenre"></span>
+                    <span class="movie-badge rating-badge">
+                        <span class="rating-star">⭐</span>
+                        <span id="movieRating"></span>
+                    </span>
+                    <span class="movie-badge">
+                        <span id="movieDuration"></span>
+                    </span>
+                </div>
+            </div>
+            <div class="movie-description" id="movieDescription"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedSeats = [];
+        const SEAT_PRICE = 12; // Price per seat in dollars
+        let movieDatabase = {}; // Store all movies for easy lookup
+
+        // Sample cinema data
+        const cinemas = [
+            {
+                id: 1,
+                name: "Paramount Cineplex",
+                location: "Downtown Center, Main Street",
+                rating: 4.5,
+                image: "images/background-a-movie-theater-where-love-stories-are-unfolding-on-the-big-screen-and-the-smell-of-popcorn-fills-the-air-photo.jpg",
+                movies: [
+                    {
+                        title: "Dune: Part Two",
+                        genre: "Sci-Fi/Adventure",
+                        rating: 8.2,
+                        duration: "166 minutes",
+                        description: "An epic continuation of the sci-fi saga. Paul Atreides travels to the dangerous planet Arrakis to protect the future of his family and people.",
+                        trailer: "https://www.youtube.com/embed/Way9Dexny3w",
+                        times: ["2:30 PM", "5:15 PM", "8:00 PM", "10:45 PM"]
+                    },
+                    {
+                        title: "Oppenheimer",
+                        genre: "Biography/Drama",
+                        rating: 8.5,
+                        duration: "180 minutes",
+                        description: "The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb during World War II.",
+                        trailer: "https://www.youtube.com/embed/uYPbbksJxIg",
+                        times: ["1:45 PM", "4:20 PM", "7:00 PM", "9:30 PM"]
+                    },
+                    {
+                        title: "Killers of the Flower Moon",
+                        genre: "Drama/Crime",
+                        rating: 8.0,
+                        duration: "206 minutes",
+                        description: "A Western crime drama following the FBI investigation into murders of Osage Nation members in 1920s Oklahoma.",
+                        trailer: "https://www.youtube.com/embed/n8f8Ek5LvEo",
+                        times: ["3:00 PM", "6:30 PM", "9:15 PM"]
+                    }
+                ]
+            },
+            {
+                id: 2,
+                name: "Star Theatre Plaza",
+                location: "Riverside Mall, Oak Avenue",
+                rating: 4.7,
+                image: "images/gettyimages-187137230-612x612.jpg",
+                movies: [
+                    {
+                        title: "Dune: Part Two",
+                        genre: "Sci-Fi/Adventure",
+                        rating: 8.2,
+                        duration: "166 minutes",
+                        description: "An epic continuation of the sci-fi saga. Paul Atreides travels to the dangerous planet Arrakis to protect the future of his family and people.",
+                        times: ["2:00 PM", "5:00 PM", "8:00 PM"]
+                    },
+                    {
+                        title: "Barbie",
+                        genre: "Comedy/Fantasy",
+                        rating: 7.9,
+                        duration: "114 minutes",
+                        description: "Barbie escapes her perfect pink world and sets out on a journey to discover what it means to be human in the real world.",
+                        trailer: "https://www.youtube.com/embed/HHKwAJ9kj6U",
+                        times: ["1:30 PM", "4:15 PM", "7:30 PM", "10:00 PM"]
+                    },
+                    {
+                        title: "Killers of the Flower Moon",
+                        genre: "Drama/Crime",
+                        rating: 8.0,
+                        duration: "206 minutes",
+                        description: "A Western crime drama following the FBI investigation into murders of Osage Nation members in 1920s Oklahoma.",
+                        times: ["3:45 PM", "6:15 PM", "9:00 PM"]
+                    },
+                    {
+                        title: "The Hunger Games: Ballad of Songbirds and Snakes",
+                        genre: "Action/Adventure",
+                        rating: 7.7,
+                        duration: "157 minutes",
+                        description: "A prequel to The Hunger Games, following young Coriolanus Snow as he navigates the 10th Hunger Games as a mentor.",
+                        times: ["2:15 PM", "5:30 PM", "8:45 PM"]
+                    }
+                ]
+            },
+            {
+                id: 3,
+                name: "Galaxy IMAX",
+                location: "Tech Park, Highway 5",
+                rating: 4.6,
+                image: "images/images.jpg",
+                movies: [
+                    {
+                        title: "Oppenheimer",
+                        genre: "Biography/Drama",
+                        rating: 8.5,
+                        duration: "180 minutes",
+                        description: "The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb during World War II.",
+                        times: ["2:45 PM", "5:45 PM", "9:00 PM"]
+                    },
+                    {
+                        title: "Dune: Part Two",
+                        genre: "Sci-Fi/Adventure",
+                        rating: 8.2,
+                        duration: "166 minutes",
+                        description: "An epic continuation of the sci-fi saga. Paul Atreides travels to the dangerous planet Arrakis to protect the future of his family and people.",
+                        times: ["1:15 PM", "4:00 PM", "6:45 PM", "9:30 PM"]
+                    },
+                    {
+                        title: "Elemental",
+                        genre: "Animation/Adventure",
+                        rating: 7.8,
+                        duration: "101 minutes",
+                        description: "In a city where fire, water, land and air residents live together, a tense relationship between firefighter Ember and water droplet Wade leads to an unlikely partnership.",
+                        trailer: "https://www.youtube.com/embed/RrDlX4sD8r8",
+                        times: ["3:30 PM", "7:00 PM", "10:15 PM"]
+                    }
+                ]
+            },
+            {
+                id: 4,
+                name: "Sunrise Cinema",
+                location: "Shopping District, Park Road",
+                rating: 4.3,
+                image: "images/pexels-photo-7991579.jpeg",
+                movies: [
+                    {
+                        title: "The Hunger Games: Ballad of Songbirds and Snakes",
+                        genre: "Action/Adventure",
+                        rating: 7.7,
+                        duration: "157 minutes",
+                        description: "A prequel to The Hunger Games, following young Coriolanus Snow as he navigates the 10th Hunger Games as a mentor.",                        trailer: "https://www.youtube.com/embed/0X7zox0FjFM",                        times: ["2:00 PM", "5:15 PM", "8:30 PM"]
+                    },
+                    {
+                        title: "Barbie",
+                        genre: "Comedy/Fantasy",
+                        rating: 7.9,
+                        duration: "114 minutes",
+                        description: "Barbie escapes her perfect pink world and sets out on a journey to discover what it means to be human in the real world.",
+                        times: ["1:45 PM", "4:30 PM", "7:15 PM", "9:45 PM"]
+                    }
+                ]
+            },
+            {
+                id: 5,
+                name: "Neon Lights Cinema",
+                location: "Central Business District",
+                rating: 4.8,
+                image: "images/photo-1595769816263-9b910be24d5f.avif",
+                movies: [
+                    {
+                        title: "Dune: Part Two",
+                        genre: "Sci-Fi/Adventure",
+                        rating: 8.2,
+                        duration: "166 minutes",
+                        description: "An epic continuation of the sci-fi saga. Paul Atreides travels to the dangerous planet Arrakis to protect the future of his family and people.",
+                        times: ["1:30 PM", "4:45 PM", "7:30 PM", "10:00 PM"]
+                    },
+                    {
+                        title: "Oppenheimer",
+                        genre: "Biography/Drama",
+                        rating: 8.5,
+                        duration: "180 minutes",
+                        description: "The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb during World War II.",
+                        times: ["2:15 PM", "5:00 PM", "8:15 PM"]
+                    },
+                    {
+                        title: "Elemental",
+                        genre: "Animation/Adventure",
+                        rating: 7.8,
+                        duration: "101 minutes",
+                        description: "In a city where fire, water, land and air residents live together, a tense relationship between firefighter Ember and water droplet Wade leads to an unlikely partnership.",
+                        times: ["3:00 PM", "6:00 PM", "9:00 PM"]
+                    },
+                    {
+                        title: "Killers of the Flower Moon",
+                        genre: "Drama/Crime",
+                        rating: 8.0,
+                        duration: "206 minutes",
+                        description: "A Western crime drama following the FBI investigation into murders of Osage Nation members in 1920s Oklahoma.",
+                        times: ["2:45 PM", "5:30 PM", "8:45 PM"]
+                    }
+                ]
+            }
+        ];
+
+        // Function to render cinema cards
+        function renderCinemas() {
+            const container = document.getElementById('cinemas-container');
+            container.innerHTML = '';
+            movieDatabase = {}; // Clear and rebuild movie database
+
+            cinemas.forEach(cinema => {
+                const card = document.createElement('div');
+                card.className = 'cinema-card';
+
+                const stars = '⭐'.repeat(Math.floor(cinema.rating));
+                const moviesHTML = cinema.movies.length > 0
+                    ? cinema.movies.map((movie, index) => {
+                        const movieId = `movie_${cinema.id}_${index}`;
+                        // Store movie details in database
+                        movieDatabase[movieId] = {
+                            title: movie.title,
+                            genre: movie.genre,
+                            rating: movie.rating,
+                            duration: movie.duration,
+                            description: movie.description,
+                            trailer: movie.trailer
+                        };
+                        return `
+                        <div class="movie-item">
+                            <div class="movie-name">${movie.title}</div>
+                            <div class="movie-actions">
+                                <button class="details-btn" onclick="openMovieDetailsById('${movieId}')">View Details</button>
+                            </div>
+                            <div class="movie-times">
+                                ${movie.times.map(time => `<span class="time-badge" onclick="openBooking('${cinema.name.replace(/'/g, "\\'")}', '${movie.title.replace(/'/g, "\\'")}', '${time}')">${time}</span>`).join('')}
+                            </div>
+                        </div>
+                    `}).join('')
+                    : '<div class="no-movies">No movies showing currently</div>';
+
+                card.innerHTML = `
+                    <div class="cinema-image" style="background-image: url('${cinema.image}')"></div>
+                    <div class="cinema-header">
+                        <div class="cinema-name">${cinema.name}</div>
+                        <div class="cinema-location">${cinema.location}</div>
+                        <div class="rating">
+                            <span class="rating-star">${stars}</span>
+                            ${cinema.rating}
+                        </div>
+                    </div>
+                    <div class="movies-section">
+                        <div class="movies-title">Now Showing</div>
+                        ${moviesHTML}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', renderCinemas);
+
+        // Booking functions
+        function openBooking(cinemaName, movieTitle, time) {
+            selectedSeats = [];
+            document.getElementById('bookingCinema').textContent = cinemaName;
+            document.getElementById('bookingMovie').textContent = movieTitle;
+            document.getElementById('bookingTime').textContent = time;
+            document.getElementById('bookingModal').style.display = 'flex';
+            generateSeats();
+        }
+
+        function closeBooking() {
+            document.getElementById('bookingModal').style.display = 'none';
+            selectedSeats = [];
+        }
+
+        function generateSeats() {
+            const seatGrid = document.getElementById('seatGrid');
+            seatGrid.innerHTML = '';
+            const rows = 6;
+            const seatsPerRow = 8;
+
+            for (let row = 0; row < rows; row++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'seat-row';
+
+                for (let seat = 0; seat < seatsPerRow; seat++) {
+                    const seatBtn = document.createElement('button');
+                    const seatId = String.fromCharCode(65 + row) + (seat + 1);
+                    seatBtn.className = 'seat';
+                    seatBtn.textContent = seatId;
+                    seatBtn.onclick = () => toggleSeat(seatId, seatBtn);
+                    rowDiv.appendChild(seatBtn);
+                }
+
+                seatGrid.appendChild(rowDiv);
+            }
+        }
+
+        function toggleSeat(seatId, element) {
+            if (selectedSeats.includes(seatId)) {
+                selectedSeats = selectedSeats.filter(s => s !== seatId);
+                element.classList.remove('selected');
+            } else {
+                selectedSeats.push(seatId);
+                element.classList.add('selected');
+            }
+            updateBookingSummary();
+        }
+
+        function updateBookingSummary() {
+            const display = selectedSeats.length > 0 ? selectedSeats.sort().join(', ') : 'None';
+            document.getElementById('selectedSeatsDisplay').textContent = display;
+            const totalPrice = selectedSeats.length * SEAT_PRICE;
+            document.getElementById('totalPrice').textContent = `$${totalPrice}`;
+        }
+
+        function confirmBooking() {
+            if (selectedSeats.length === 0) {
+                alert('Please select at least one seat');
+                return;
+            }
+
+            const cinema = document.getElementById('bookingCinema').textContent;
+            const movie = document.getElementById('bookingMovie').textContent;
+            const time = document.getElementById('bookingTime').textContent;
+            const seats = selectedSeats.sort().join(', ');
+            const total = selectedSeats.length * SEAT_PRICE;
+
+            alert(`Booking Confirmed!\n\nCinema: ${cinema}\nMovie: ${movie}\nTime: ${time}\nSeats: ${seats}\nTotal: $${total}\n\nThank you for your booking!`);
+            closeBooking();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('bookingModal');
+            const movieModal = document.getElementById('movieModal');
+            if (event.target == modal) {
+                closeBooking();
+            }
+            if (event.target == movieModal) {
+                closeMovieDetails();
+            }
+        }
+
+        // Movie Details Functions
+        function openMovieDetailsById(movieId) {
+            const movie = movieDatabase[movieId];
+            if (movie) {
+                document.getElementById('movieModalTitle').textContent = movie.title;
+                document.getElementById('movieGenre').textContent = movie.genre;
+                document.getElementById('movieRating').textContent = movie.rating;
+                document.getElementById('movieDuration').textContent = movie.duration;
+                document.getElementById('movieDescription').textContent = movie.description || 'No description available.';
+                if (movie.trailer) {
+                    document.getElementById('movieTrailer').src = movie.trailer;
+                }
+                document.getElementById('movieModal').style.display = 'flex';
+            }
+        }
+
+        function closeMovieDetails() {
+            document.getElementById('movieModal').style.display = 'none';
+            document.getElementById('movieTrailer').src = '';
+        }
+    </script>
+</body>
+</html>
