@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinema Locations</title>
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            padding: 30px 20px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.95;
+        }
+
+        /* Back Button */
+        .back-btn {
+            margin-top: 20px;
+            padding: 12px 26px;
+            font-size: 1em;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #ff6b6b 0%, #f06595 100%);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
+        }
+
+        #map {
+            flex: 1;
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .leaflet-popup-content h3 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+
+        .leaflet-popup-content p {
+            margin: 4px 0;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .rating {
+            color: #f5b50a;
+            font-weight: bold;
+        }
+
+        /* 🎬 Custom Cinema Marker */
+        .cinema-marker {
+            background: linear-gradient(135deg, #ff6b6b 0%, #f06595 100%);
+            width: 42px;
+            height: 42px;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            position: relative;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35);
+        }
+
+        .cinema-marker::after {
+            content: "🎬";
+            width: 30px;
+            height: 30px;
+            background: white;
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transform: rotate(45deg);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>📍 Cinema Locations</h1>
+    <p>Find all cinemas near you on the map</p>
+
+    <button class="back-btn" onclick="window.location.href='cinema.html'">
+        🎭 Back to Cinema Finder
+    </button>
+</header>
+
+<div id="map"></div>
+
+<script>
+    const cinemas = [
+        { name: "Paramount Cineplex", location: "Downtown Center, Main Street", rating: 4.5, lat: 40.7128, lng: -74.0060 },
+        { name: "Star Theatre Plaza", location: "Riverside Mall, Oak Avenue", rating: 4.7, lat: 40.7215, lng: -74.0100 },
+        { name: "Galaxy IMAX", location: "Tech Park, Highway 5", rating: 4.6, lat: 40.7305, lng: -73.9950 },
+        { name: "Sunrise Cinema", location: "Shopping District, Park Road", rating: 4.3, lat: 40.7050, lng: -74.0150 },
+        { name: "Neon Lights Cinema", location: "Central Business District", rating: 4.8, lat: 40.7180, lng: -74.0020 }
+    ];
+
+    const map = L.map('map').setView([40.72, -74.005], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // 🎯 Custom Leaflet icon
+    const cinemaIcon = L.divIcon({
+        className: '',
+        html: '<div class="cinema-marker"></div>',
+        iconSize: [42, 42],
+        iconAnchor: [21, 42],
+        popupAnchor: [0, -40]
+    });
+
+    cinemas.forEach(cinema => {
+        L.marker([cinema.lat, cinema.lng], { icon: cinemaIcon })
+            .addTo(map)
+            .bindPopup(`
+                <h3>${cinema.name}</h3>
+                <p>📍 ${cinema.location}</p>
+                <p class="rating">⭐ ${cinema.rating}</p>
+            `);
+    });
+</script>
+
+</body>
+</html>
