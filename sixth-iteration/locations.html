@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinema Locations - Cinema Finder</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/map.css">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Additional map-specific styles */
+        .leaflet-popup-content {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .leaflet-popup-content-wrapper {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .leaflet-popup-close-button {
+            font-size: 20px;
+            padding: var(--space-2);
+        }
+    </style>
+</head>
+<body>
+    <div class="map-container">
+        <!-- Header -->
+        <header class="map-header">
+            <div class="map-header-content">
+                <div class="map-title">
+                    <span class="icon">📍</span>
+                    <h1>Cinema Locations</h1>
+                </div>
+                
+                <div class="map-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search cinemas...">
+                    </div>
+                    
+                    <button class="filter-toggle" id="filterToggle">
+                        <i class="fas fa-filter"></i>
+                        <span>Filters</span>
+                    </button>
+                    
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="map">
+                            <i class="fas fa-map"></i>
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                    
+                    <a href="index.html" class="btn btn-ghost">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="map-layout">
+            <!-- Sidebar -->
+            <aside class="map-sidebar" id="mapSidebar">
+                <div class="sidebar-content">
+                    <!-- Filters -->
+                    <div class="sidebar-section" id="filtersPanel" style="display: none;">
+                        <h3 class="sidebar-title">
+                            <i class="fas fa-sliders-h"></i>
+                            Filters
+                        </h3>
+                        
+                        <div class="filters-panel">
+                            <div class="filter-group">
+                                <label class="filter-label">Cinema Type</label>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="filterIMAX" checked>
+                                        <label for="filterIMAX">IMAX</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="filter3D" checked>
+                                        <label for="filter3D">3D</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="filterVIP" checked>
+                                        <label for="filterVIP">VIP</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="filterLuxury" checked>
+                                        <label for="filterLuxury">Luxury Seating</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label class="filter-label">Distance</label>
+                                <input type="range" class="range-slider" id="distanceRange" min="1" max="50" value="25">
+                                <div class="range-value"><span id="distanceValue">25</span> miles</div>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label class="filter-label">Rating</label>
+                                <input type="range" class="range-slider" id="ratingRange" min="1" max="5" step="0.1" value="3">
+                                <div class="range-value">⭐ <span id="ratingValue">3.0</span> and above</div>
+                            </div>
+                            
+                            <button class="btn btn-primary" onclick="applyFilters()" style="width: 100%;">
+                                Apply Filters
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cinema Stats -->
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Statistics
+                        </h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);">
+                            <div style="text-align: center; padding: var(--space-3); background: var(--primary-50); border-radius: var(--radius-lg);">
+                                <div style="font-size: var(--text-2xl); font-weight: var(--font-bold); color: var(--primary-600);" id="totalCinemas">0</div>
+                                <div style="font-size: var(--text-xs); color: var(--primary-700);">Total Cinemas</div>
+                            </div>
+                            <div style="text-align: center; padding: var(--space-3); background: var(--secondary-50); border-radius: var(--radius-lg);">
+                                <div style="font-size: var(--text-2xl); font-weight: var(--font-bold); color: var(--secondary-600);" id="avgRating">0</div>
+                                <div style="font-size: var(--text-xs); color: var(--secondary-700);">Avg Rating</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cinema List -->
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title">
+                            <i class="fas fa-theater-masks"></i>
+                            Nearby Cinemas
+                        </h3>
+                        
+                        <div class="cinema-list" id="cinemaList">
+                            <!-- Cinemas will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Map -->
+            <main class="map-main">
+                <div id="cinemaMap"></div>
+                
+                <!-- Floating Controls -->
+                <div class="map-controls-float">
+                    <button class="control-btn" onclick="centerMap()" title="Center Map">
+                        <i class="fas fa-crosshairs"></i>
+                    </button>
+                    <button class="control-btn" onclick="toggleFullscreen()" title="Fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button class="control-btn" onclick="resetMap()" title="Reset">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                </div>
+                
+                <!-- Loading State -->
+                <div class="map-loading" id="mapLoading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading cinemas...</div>
+                </div>
+                
+                <!-- Distance Scale -->
+                <div class="distance-scale" id="distanceScale">
+                    Scale: <span id="scaleValue">1</span> mile
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/data.js"></script>
+    <script>
+        // Initialize map and cinema data
+        let map;
+        let markers = [];
+        let currentCinema = null;
+        let cinemaData;
+        let userLocation = null;
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            cinemaData = new CinemaData();
+            initializeMap();
+            getUserLocation();
+            renderCinemaList();
+            updateStatistics();
+            setupEventListeners();
+        }
+
+        function initializeMap() {
+            // Create map centered on New York
+            map = L.map('cinemaMap').setView([40.7128, -74.0060], 12);
+
+            // Add tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Add cinema markers
+            addCinemaMarkers();
+        }
+
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        // Add user location marker
+                        L.marker([userLocation.lat, userLocation.lng], {
+                            icon: L.divIcon({
+                                className: '',
+                                html: '<div style="background: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>',
+                                iconSize: [16, 16],
+                                iconAnchor: [8, 8]
+                            })
+                        }).addTo(map).bindPopup('Your Location');
+                        
+                        // Center map on user location
+                        map.setView([userLocation.lat, userLocation.lng], 13);
+                        
+                        updateDistances();
+                        renderCinemaList();
+                    },
+                    error => {
+                        console.log('Could not get user location:', error);
+                    }
+                );
+            }
+        }
+
+        function addCinemaMarkers() {
+            cinemaData.cinemas.forEach(cinema => {
+                const marker = createCinemaMarker(cinema);
+                markers.push(marker);
+            });
+        }
+
+        function createCinemaMarker(cinema) {
+            const markerClass = cinema.rating >= 4.7 ? 'premium' : 
+                               cinema.rating >= 4.3 ? '' : 'budget';
+            
+            const customIcon = L.divIcon({
+                className: '',
+                html: `<div class="custom-marker ${markerClass}"></div>`,
+                iconSize: [40, 40],
+                iconAnchor: [20, 35],
+                popupAnchor: [0, -35]
+            });
+
+            const marker = L.marker([cinema.lat, cinema.lng], { icon: customIcon })
+                .addTo(map)
+                .bindPopup(createPopupContent(cinema))
+                .on('popupopen', () => selectCinema(cinema));
+
+            return marker;
+        }
+
+        function createPopupContent(cinema) {
+            const movies = cinema.movies.map(movieId => {
+                const movie = cinemaData.getMovieById(movieId);
+                return movie ? movie.title : '';
+            }).filter(title => title).slice(0, 3).join(', ');
+
+            const amenities = cinema.amenities.slice(0, 3).map(amenity => 
+                `<span class="amenity-badge">${amenity}</span>`
+            ).join('');
+
+            return `
+                <div class="cinema-popup">
+                    <div class="popup-header">
+                        <div class="popup-title">${cinema.name}</div>
+                        <div class="popup-rating">
+                            ⭐ ${cinema.rating}
+                        </div>
+                    </div>
+                    
+                    <div class="popup-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        ${cinema.location}
+                    </div>
+                    
+                    <div class="popup-movies">
+                        <div class="popup-movies-title">Now Showing:</div>
+                        <div class="popup-movie-list">${movies}</div>
+                    </div>
+                    
+                    <div class="popup-amenities">${amenities}</div>
+                    
+                    <div class="popup-actions">
+                        <button class="popup-btn primary" onclick="viewCinema(${cinema.id})">
+                            View Details
+                        </button>
+                        <button class="popup-btn secondary" onclick="getDirections(${cinema.id})">
+                            Directions
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCinemaList() {
+            const container = document.getElementById('cinemaList');
+            const filteredCinemas = getFilteredCinemas();
+            
+            container.innerHTML = filteredCinemas.map(cinema => {
+                const distance = userLocation ? 
+                    calculateDistance(userLocation.lat, userLocation.lng, cinema.lat, cinema.lng) : 
+                    null;
+                
+                const moviesCount = cinema.movies.length;
+                const movies = cinema.movies.slice(0, 2).map(movieId => {
+                    const movie = cinemaData.getMovieById(movieId);
+                    return movie ? movie.title : '';
+                }).filter(title => title).join(', ');
+
+                return `
+                    <div class="cinema-list-item" onclick="selectCinemaList(${cinema.id})">
+                        <div class="cinema-list-header">
+                            <div class="cinema-list-name">${cinema.name}</div>
+                            <div class="cinema-list-rating">
+                                ⭐ ${cinema.rating}
+                            </div>
+                        </div>
+                        
+                        <div class="cinema-list-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${cinema.location}
+                        </div>
+                        
+                        ${distance ? `
+                            <div class="cinema-list-distance">
+                                <i class="fas fa-route"></i>
+                                ${distance.toFixed(1)} miles away
+                            </div>
+                        ` : ''}
+                        
+                        <div class="cinema-list-movies">
+                            <strong>${moviesCount}</strong> movies including: ${movies}
+                        </div>
+                        
+                        <div class="cinema-list-amenities">
+                            ${cinema.amenities.slice(0, 2).map(amenity => 
+                                `<span class="amenity-badge">${amenity}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getFilteredCinemas() {
+            // Apply filters from sidebar
+            let filtered = [...cinemaData.cinemas];
+            
+            // Filter by rating
+            const minRating = parseFloat(document.getElementById('ratingRange').value);
+            filtered = filtered.filter(cinema => cinema.rating >= minRating);
+            
+            // Filter by amenities
+            const amenities = [];
+            if (document.getElementById('filterIMAX').checked) amenities.push('IMAX');
+            if (document.getElementById('filter3D').checked) amenities.push('3D');
+            if (document.getElementById('filterVIP').checked) amenities.push('VIP');
+            if (document.getElementById('filterLuxury').checked) amenities.push('Luxury Seating');
+            
+            if (amenities.length > 0) {
+                filtered = filtered.filter(cinema => 
+                    amenities.some(amenity => 
+                        cinema.amenities.some(cinemaAmenity => 
+                            cinemaAmenity.toLowerCase().includes(amenity.toLowerCase())
+                        )
+                    )
+                );
+            }
+            
+            // Filter by distance if user location is available
+            if (userLocation) {
+                const maxDistance = parseInt(document.getElementById('distanceRange').value);
+                filtered = filtered.filter(cinema => {
+                    const distance = calculateDistance(
+                        userLocation.lat, userLocation.lng, 
+                        cinema.lat, cinema.lng
+                    );
+                    return distance <= maxDistance;
+                });
+            }
+            
+            // Sort by distance (if available) or rating
+            filtered.sort((a, b) => {
+                if (userLocation) {
+                    const distA = calculateDistance(userLocation.lat, userLocation.lng, a.lat, a.lng);
+                    const distB = calculateDistance(userLocation.lat, userLocation.lng, b.lat, b.lng);
+                    return distA - distB;
+                }
+                return b.rating - a.rating;
+            });
+            
+            return filtered;
+        }
+
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            const R = 3959; // Earth's radius in miles
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function updateDistances() {
+            if (!userLocation) return;
+            
+            cinemaData.cinemas.forEach(cinema => {
+                cinema.distance = calculateDistance(
+                    userLocation.lat, userLocation.lng, 
+                    cinema.lat, cinema.lng
+                );
+            });
+        }
+
+        function updateStatistics() {
+            const filteredCinemas = getFilteredCinemas();
+            document.getElementById('totalCinemas').textContent = filteredCinemas.length;
+            
+            const avgRating = filteredCinemas.reduce((sum, cinema) => sum + cinema.rating, 0) / filteredCinemas.length;
+            document.getElementById('avgRating').textContent = avgRating.toFixed(1);
+        }
+
+        function selectCinema(cinema) {
+            currentCinema = cinema;
+            
+            // Highlight in list
+            document.querySelectorAll('.cinema-list-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const listItems = document.querySelectorAll('.cinema-list-item');
+            const cinemaIndex = cinemaData.cinemas.findIndex(c => c.id === cinema.id);
+            if (listItems[cinemaIndex]) {
+                listItems[cinemaIndex].classList.add('active');
+                listItems[cinemaIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function selectCinemaList(cinemaId) {
+            const cinema = cinemaData.getCinemaById(cinemaId);
+            if (cinema) {
+                // Center map on cinema
+                map.setView([cinema.lat, cinema.lng], 15);
+                
+                // Open popup
+                markers.forEach(marker => {
+                    const popup = marker.getPopup();
+                    if (popup && popup.getContent().includes(cinema.name)) {
+                        marker.openPopup();
+                    }
+                });
+                
+                selectCinema(cinema);
+            }
+        }
+
+        function viewCinema(cinemaId) {
+            const cinema = cinemaData.getCinemaById(cinemaId);
+            if (cinema) {
+                // Show cinema details on map
+                // Center map on cinema
+                map.setView([cinema.lat, cinema.lng], 15);
+                
+                // Open cinema popup
+                markers.forEach(marker => {
+                    const popup = marker.getPopup();
+                    if (popup && popup.getContent().includes(cinema.name)) {
+                        marker.openPopup();
+                    }
+                });
+            }
+        }
+
+        function getDirections(cinemaId) {
+            const cinema = cinemaData.getCinemaById(cinemaId);
+            if (cinema) {
+                // Open in Google Maps
+                window.open(`https://www.google.com/maps/dir/?api=1&destination=${cinema.lat},${cinema.lng}`, '_blank');
+            }
+        }
+
+        function centerMap() {
+            if (userLocation) {
+                map.setView([userLocation.lat, userLocation.lng], 13);
+            } else {
+                map.setView([40.7128, -74.0060], 12);
+            }
+        }
+
+        function resetMap() {
+            map.setView([40.7128, -74.0060], 12);
+            document.getElementById('searchInput').value = '';
+            renderCinemaList();
+        }
+
+        function toggleFullscreen() {
+            const mapContainer = document.querySelector('.map-main');
+            if (!document.fullscreenElement) {
+                mapContainer.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function applyFilters() {
+            renderCinemaList();
+            updateStatistics();
+            
+            // Show filtered markers only
+            const filteredCinemas = getFilteredCinemas();
+            const filteredIds = new Set(filteredCinemas.map(c => c.id));
+            
+            markers.forEach((marker, index) => {
+                const cinema = cinemaData.cinemas[index];
+                if (filteredIds.has(cinema.id)) {
+                    marker.addTo(map);
+                } else {
+                    marker.remove();
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const query = e.target.value.toLowerCase();
+                const filtered = cinemaData.cinemas.filter(cinema => 
+                    cinema.name.toLowerCase().includes(query) ||
+                    cinema.location.toLowerCase().includes(query) ||
+                    cinema.amenities.some(amenity => amenity.toLowerCase().includes(query))
+                );
+                
+                const container = document.getElementById('cinemaList');
+                container.innerHTML = filtered.map(cinema => `
+                    <div class="cinema-list-item" onclick="selectCinemaList(${cinema.id})">
+                        <div class="cinema-list-header">
+                            <div class="cinema-list-name">${cinema.name}</div>
+                            <div class="cinema-list-rating">⭐ ${cinema.rating}</div>
+                        </div>
+                        <div class="cinema-list-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${cinema.location}
+                        </div>
+                    </div>
+                `).join('');
+            });
+
+            // Filter toggle
+            document.getElementById('filterToggle').addEventListener('click', function() {
+                const panel = document.getElementById('filtersPanel');
+                const button = this;
+                
+                if (panel.style.display === 'none') {
+                    panel.style.display = 'block';
+                    button.classList.add('active');
+                } else {
+                    panel.style.display = 'none';
+                    button.classList.remove('active');
+                }
+            });
+
+            // Range sliders
+            document.getElementById('distanceRange').addEventListener('input', function() {
+                document.getElementById('distanceValue').textContent = this.value;
+            });
+
+            document.getElementById('ratingRange').addEventListener('input', function() {
+                document.getElementById('ratingValue').textContent = parseFloat(this.value).toFixed(1);
+            });
+
+            // View toggle
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const view = this.dataset.view;
+                    if (view === 'list') {
+                        document.querySelector('.map-sidebar').style.display = 'block';
+                        document.querySelector('.map-main').style.display = 'none';
+                    } else {
+                        document.querySelector('.map-sidebar').style.display = 'block';
+                        document.querySelector('.map-main').style.display = 'block';
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

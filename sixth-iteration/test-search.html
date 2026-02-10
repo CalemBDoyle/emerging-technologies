@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Search - Cinema Finder</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .search { width: 300px; padding: 10px; margin-bottom: 20px; }
+        .movie { border: 1px solid #ccc; padding: 10px; margin: 10px 0; cursor: pointer; }
+        .movie:hover { background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Test Search Functionality</h1>
+    
+    <div>
+        <input type="text" id="searchInput" class="search" placeholder="Search for movies...">
+        <button onclick="testSearchNow()">Search</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script>
+        // Sample movie data
+        const movies = [
+            { title: 'Dune: Part Two', genre: 'Sci-Fi/Adventure' },
+            { title: 'Oppenheimer', genre: 'Biography/Drama' },
+            { title: 'Barbie', genre: 'Comedy/Fantasy' },
+            { title: 'Spider-Man: Across the Spider-Verse', genre: 'Animation/Action' }
+        ];
+        
+        function testSearchNow() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const results = movies.filter(movie => 
+                movie.title.toLowerCase().includes(query) ||
+                movie.genre.toLowerCase().includes(query)
+            );
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h3>Results:</h3>';
+            
+            if (results.length === 0) {
+                resultsDiv.innerHTML += '<p>No movies found</p>';
+            } else {
+                resultsDiv.innerHTML = results.map(movie => 
+                    `<div class="movie">
+                        <strong>${movie.title}</strong> - ${movie.genre}
+                    </div>`
+                ).join('');
+            }
+        }
+        
+        // Test on page load
+        window.onload = function() {
+            console.log('Test page loaded with movies:', movies);
+            testSearchNow();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showtimes - Cinema Finder</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/design-system.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background: var(--gradient-light);
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: var(--z-sticky);
+        }
+        
+        .navbar-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-4) var(--space-6);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            text-decoration: none;
+            color: var(--neutral-900);
+            font-weight: var(--font-bold);
+            font-size: var(--text-xl);
+        }
+        
+        .logo i {
+            color: var(--primary-500);
+            font-size: var(--text-2xl);
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: var(--space-6);
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: var(--neutral-700);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            transition: color var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-600);
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: var(--space-3);
+            align-items: center;
+        }
+        
+        /* Main Content */
+        .showtimes-container {
+            padding: var(--space-16) 0;
+            background: white;
+            min-height: calc(100vh - 80px);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+        
+        .section-title {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--neutral-900);
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: var(--space-4);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-dropdown {
+            padding: var(--space-3) var(--space-4);
+            border: 2px solid var(--neutral-300);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-base);
+            background: white;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .filter-dropdown:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px var(--primary-100);
+        }
+        
+        .date-input {
+            padding: var(--space-3) var(--space-4);
+            border: 2px solid var(--neutral-300);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-base);
+            transition: all var(--transition-fast);
+        }
+        
+        .date-input:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px var(--primary-100);
+        }
+        
+        /* Showtimes Grid */
+        .showtimes-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+        
+        .cinema-section {
+            margin-bottom: var(--space-12);
+        }
+        
+        .cinema-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: var(--space-6);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--space-6);
+        }
+        
+        .cinema-title {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-2);
+        }
+        
+        .cinema-info {
+            display: flex;
+            gap: var(--space-4);
+            font-size: var(--text-lg);
+            opacity: 0.9;
+        }
+        
+        .cinema-location {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .showtimes-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-6);
+        }
+        
+        .time-slot {
+            background: var(--neutral-50);
+            border: 2px solid var(--neutral-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .time-slot:hover {
+            background: var(--primary-100);
+            border-color: var(--primary-300);
+            transform: translateY(-2px);
+        }
+        
+        .time-slot.booked {
+            background: var(--accent-100);
+            border-color: var(--accent-300);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .time {
+            font-weight: var(--font-semibold);
+            color: var(--neutral-900);
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-2);
+        }
+        
+        .movie-title {
+            font-weight: var(--font-medium);
+            color: var(--neutral-700);
+            margin-bottom: var(--space-1);
+        }
+        
+        .time-actions {
+            display: flex;
+            gap: var(--space-2);
+            margin-top: var(--space-3);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-16);
+            grid-column: 1 / -1;
+        }
+        
+        .empty-icon {
+            font-size: var(--text-6xl);
+            color: var(--neutral-300);
+            margin-bottom: var(--space-4);
+        }
+        
+        .empty-title {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--neutral-700);
+            margin-bottom: var(--space-2);
+        }
+        
+        .empty-text {
+            color: var(--neutral-500);
+            font-size: var(--text-lg);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar-content {
+                flex-direction: column;
+                gap: var(--space-4);
+            }
+            
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: var(--space-4);
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: var(--space-4);
+                align-items: flex-start;
+            }
+            
+            .filter-controls {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .showtimes-list {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: var(--space-4);
+            }
+            
+            .time-slot {
+                padding: var(--space-3);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .showtimes-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="index.html" class="logo">
+                <i class="fas fa-film"></i>
+                Cinema Finder
+            </a>
+            
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    Home
+                </a>
+                <a href="locations.html" class="nav-link">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Locations
+                </a>
+                <a href="movies.html" class="nav-link">
+                    <i class="fas fa-film"></i>
+                    Movies
+                </a>
+                <a href="showtimes.html" class="nav-link" style="color: var(--primary-600); font-weight: var(--font-semibold);">
+                    <i class="fas fa-calendar"></i>
+                    Showtimes
+                </a>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="btn btn-ghost" onclick="toggleSearch()">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="btn btn-primary" onclick="openAuth()">
+                    Sign In
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="showtimes-container">
+        <div class="section-header">
+            <h1 class="section-title">Showtimes</h1>
+            
+            <div class="filter-controls">
+                <select class="filter-dropdown" id="cinemaFilter" onchange="filterShowtimes()">
+                    <option value="">All Cinemas</option>
+                    <option value="1">Paramount Cineplex</option>
+                    <option value="2">Star Theatre Plaza</option>
+                    <option value="3">Galaxy IMAX</option>
+                    <option value="4">Sunrise Cinema</option>
+                    <option value="5">Neon Lights Cinema</option>
+                </select>
+                
+                <select class="filter-dropdown" id="dateFilter" onchange="filterShowtimes()">
+                    <option value="">All Dates</option>
+                </select>
+                
+                <input type="date" class="date-input" id="dateInput" onchange="filterShowtimes()">
+            </div>
+        </div>
+
+        <!-- Showtimes Grid -->
+        <div class="showtimes-grid" id="showtimesGrid">
+            <!-- Showtimes will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/data.js"></script>
+    <script>
+        // Global variables
+        let cinemaData;
+        let currentUser = null;
+        let allCinemas = [];
+        let allShowtimes = [];
+        let filteredShowtimes = [];
+        
+        // Sample showtimes data
+        const sampleShowtimes = {
+            1: {
+                'dune_part_two': ['10:00 AM', '1:30 PM', '4:30 PM', '7:15 PM', '10:00 PM'],
+                'oppenheimer': ['11:00 AM', '2:30 PM', '6:00 PM', '9:30 PM'],
+                'killers_flower_moon': ['12:00 PM', '3:30 PM', '7:00 PM', '10:30 PM']
+            },
+            2: {
+                'barbie': ['11:00 AM', '2:00 PM', '5:00 PM', '8:00 PM'],
+                'hunger_games_songbirds': ['10:30 AM', '1:30 PM', '4:30 PM', '7:30 PM', '10:30 PM'],
+                'elemental': ['11:00 AM', '1:30 PM', '4:30 PM', '7:30 PM']
+            },
+            3: {
+                'dune_part_two': ['12:00 PM', '3:00 PM', '6:00 PM', '9:00 PM'],
+                'guardians_vol3': ['11:00 AM', '2:00 PM', '5:00 PM', '8:00 PM'],
+                'spider_man_across': ['10:00 AM', '1:00 PM', '4:00 PM', '7:00 PM', '10:00 PM']
+            }
+        };
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeShowtimes();
+            setupEventListeners();
+        });
+
+        function initializeShowtimes() {
+            cinemaData = new CinemaData();
+            loadUserData();
+            allCinemas = cinemaData.cinemas || [];
+            
+            // Generate showtimes data
+            generateShowtimesData();
+            renderShowtimes();
+        }
+
+        function generateShowtimesData() {
+            allShowtimes = [];
+            
+            allCinemas.forEach(cinema => {
+                const cinemaShowtimes = sampleShowtimes[cinema.id] || {};
+                
+                Object.keys(cinemaShowtimes).forEach(movieId => {
+                    const movie = cinemaData.getMovieById(movieId);
+                    if (movie) {
+                        cinemaShowtimes[movieId].forEach(time => {
+                            allShowtimes.push({
+                                cinemaId: cinema.id,
+                                cinemaName: cinema.name,
+                                cinemaLocation: cinema.location,
+                                movieId: movieId,
+                                movieTitle: movie.title,
+                                movieGenre: movie.genre,
+                                movieRating: movie.rating,
+                                time: time,
+                                date: getTodayDate(),
+                                available: true
+                            });
+                        });
+                    }
+                });
+            });
+        }
+        
+        function getTodayDate() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+        
+        function renderShowtimes() {
+            const container = document.getElementById('showtimesGrid');
+            const cinemaFilter = document.getElementById('cinemaFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            // Filter showtimes
+            filteredShowtimes = allShowtimes.filter(showtime => {
+                let matches = true;
+                
+                if (cinemaFilter && showtime.cinemaId != cinemaFilter) {
+                    matches = false;
+                }
+                
+                if (dateFilter && showtime.date !== dateFilter) {
+                    matches = false;
+                }
+                
+                if (searchTerm && !showtime.movieTitle.toLowerCase().includes(searchTerm)) {
+                    matches = false;
+                }
+                
+                return matches;
+            });
+            
+            if (filteredShowtimes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <h3 class="empty-title">No Showtimes Found</h3>
+                        <p class="empty-text">Try adjusting your filters or check back later</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Group showtimes by cinema
+            const cinemaGroups = {};
+            filteredShowtimes.forEach(showtime => {
+                if (!cinemaGroups[showtime.cinemaId]) {
+                    cinemaGroups[showtime.cinemaId] = {
+                        cinemaId: showtime.cinemaId,
+                        cinemaName: showtime.cinemaName,
+                        cinemaLocation: showtime.cinemaLocation,
+                        movies: {}
+                    };
+                }
+                
+                if (!cinemaGroups[showtime.cinemaId].movies[showtime.movieId]) {
+                    cinemaGroups[showtime.cinemaId].movies[showtime.movieId] = {
+                        title: showtime.movieTitle,
+                        genre: showtime.movieGenre,
+                        rating: showtime.movieRating,
+                        times: []
+                    };
+                }
+                
+                cinemaGroups[showtime.cinemaId].movies[showtime.movieId].times.push(showtime.time);
+            });
+            
+            // Render cinema sections
+            container.innerHTML = Object.values(cinemaGroups).map(cinema => `
+                <div class="cinema-section">
+                    <div class="cinema-header">
+                        <h2 class="cinema-title">${cinema.cinemaName}</h2>
+                        <div class="cinema-info">
+                            <div class="cinema-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                ${cinema.cinemaLocation}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="showtimes-list">
+                        ${Object.values(cinema.movies).map(movie => `
+                            <div class="time-slot" onclick="selectShowtime(${cinema.cinemaId}, '${movie.title}', '${movie.time}')">
+                                <div class="time">${movie.time}</div>
+                                <div class="movie-title">${movie.title}</div>
+                                <div class="time-actions">
+                                    <span style="color: var(--success-color);">★ ${movie.rating}</span>
+                                    <button class="btn btn-primary" onclick="event.stopPropagation(); bookTickets(${cinema.cinemaId}, '${movie.title}', '${movie.time}')">
+                                        Book
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterShowtimes() {
+            renderShowtimes();
+        }
+
+        function selectShowtime(cinemaId, movieTitle, time) {
+            const message = `Selected: ${movieTitle} at ${time} (${cinemaData.getCinemaById(cinemaId)?.name || 'Cinema'})`;
+            alert(message);
+        }
+
+        function bookTickets(cinemaId, movieTitle, time) {
+            if (!currentUser) {
+                alert('Please sign in to book tickets');
+                return;
+            }
+            
+            const message = `Booking: ${movieTitle} at ${time} for cinema ID ${cinemaId}`;
+            alert(message);
+            
+            // In a real app, this would redirect to booking page
+            // window.location.href = `index.html?cinema=${cinemaId}&movie=${movieTitle}&time=${time}`;
+        }
+
+        function toggleSearch() {
+            document.getElementById('searchInput').focus();
+        }
+
+        function openAuth() {
+            // Redirect to main page with auth modal
+            window.location.href = 'index.html?auth=true';
+        }
+
+        function setupEventListeners() {
+            // Search on Enter key
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    filterShowtimes();
+                }
+            });
+            
+            // Set today's date as default
+            const today = getTodayDate();
+            document.getElementById('dateFilter').value = today;
+            
+            // Populate unique dates from available showtimes
+            const uniqueDates = [...new Set(allShowtimes.map(s => s.date))].sort();
+            const dateFilter = document.getElementById('dateFilter');
+            
+            // Clear existing options
+            dateFilter.innerHTML = '<option value="">All Dates</option>';
+            
+            // Add unique dates
+            uniqueDates.forEach(date => {
+                const option = document.createElement('option');
+                option.value = date;
+                option.textContent = new Date(date).toLocaleDateString();
+                dateFilter.appendChild(option);
+            });
+        }
+    </script>
+</body>
+</html>

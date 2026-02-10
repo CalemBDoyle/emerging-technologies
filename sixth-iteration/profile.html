@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Cinema Finder</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/profile.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="profile-container">
+        <!-- Profile Header -->
+        <header class="profile-header">
+            <div class="profile-header-content">
+                <div class="profile-top">
+                    <a href="index.html" class="profile-back">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Cinema Finder
+                    </a>
+                    
+                    <div class="profile-actions">
+                        <button class="btn btn-ghost">
+                            <i class="fas fa-share-alt"></i>
+                            Share
+                        </button>
+                        <button class="btn btn-primary" onclick="openSettings()">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="profile-main">
+                    <div class="profile-avatar" id="profileAvatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    
+                    <div class="profile-info">
+                        <h1 class="profile-name" id="profileName">Guest User</h1>
+                        <div class="profile-email" id="profileEmail">guest@example.com</div>
+                        
+                        <div class="profile-stats">
+                            <div class="profile-stat">
+                                <span class="stat-number" id="totalBookings">0</span>
+                                <span class="stat-label">Bookings</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="stat-number" id="totalFavorites">0</span>
+                                <span class="stat-label">Favorites</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="stat-number" id="totalReviews">0</span>
+                                <span class="stat-label">Reviews</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="stat-number" id="memberSince">2024</span>
+                                <span class="stat-label">Member Since</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="profile-nav">
+            <div class="profile-nav-content">
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="switchTab('dashboard')">
+                        <i class="fas fa-th-large"></i>
+                        Dashboard
+                    </button>
+                    <button class="nav-tab" onclick="switchTab('bookings')">
+                        <i class="fas fa-ticket-alt"></i>
+                        My Bookings
+                        <span class="badge" id="bookingsBadge">0</span>
+                    </button>
+                    <button class="nav-tab" onclick="switchTab('favorites')">
+                        <i class="fas fa-heart"></i>
+                        Favorites
+                        <span class="badge" id="favoritesBadge">0</span>
+                    </button>
+                    <button class="nav-tab" onclick="switchTab('reviews')">
+                        <i class="fas fa-star"></i>
+                        My Reviews
+                    </button>
+                    <button class="nav-tab" onclick="switchTab('settings')">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Profile Content -->
+        <main class="profile-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="dashboard-icon">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <div class="dashboard-value" id="moviesWatched">0</div>
+                        <div class="dashboard-label">Movies Watched</div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="dashboard-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="dashboard-value" id="totalSpent">$0</div>
+                        <div class="dashboard-label">Total Spent</div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="dashboard-icon">
+                            <i class="fas fa-theater-masks"></i>
+                        </div>
+                        <div class="dashboard-value" id="favoriteGenre">N/A</div>
+                        <div class="dashboard-label">Favorite Genre</div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="dashboard-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="dashboard-value" id="thisMonth">0</div>
+                        <div class="dashboard-label">This Month</div>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <div class="activity-header">
+                        <h2 class="activity-title">Recent Activity</h2>
+                        <a href="#" class="view-all-link" onclick="switchTab('bookings')">
+                            View All
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="activity-list" id="recentActivity">
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <h3 class="empty-title">No Recent Activity</h3>
+                            <p class="empty-text">Start booking movies to see your activity here!</p>
+                            <button class="btn btn-primary" onclick="window.location.href='index.html'">
+                                <i class="fas fa-film"></i>
+                                Browse Movies
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bookings Section -->
+            <section id="bookings" class="content-section">
+                <div class="bookings-grid" id="bookingsList">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <h3 class="empty-title">No Bookings Yet</h3>
+                        <p class="empty-text">Your booking history will appear here once you start booking movies!</p>
+                        <button class="btn btn-primary" onclick="window.location.href='index.html'">
+                            <i class="fas fa-film"></i>
+                            Book Your First Movie
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Favorites Section -->
+            <section id="favorites" class="content-section">
+                <div class="favorites-grid" id="favoritesList">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3 class="empty-title">No Favorites Yet</h3>
+                        <p class="empty-text">Start adding movies to your favorites to see them here!</p>
+                        <button class="btn btn-primary" onclick="window.location.href='index.html'">
+                            <i class="fas fa-film"></i>
+                            Discover Movies
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reviews Section -->
+            <section id="reviews" class="content-section">
+                <div class="bookings-grid" id="reviewsList">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3 class="empty-title">No Reviews Yet</h3>
+                        <p class="empty-text">Share your thoughts about movies you've watched!</p>
+                        <button class="btn btn-primary" onclick="window.location.href='index.html'">
+                            <i class="fas fa-film"></i>
+                            Write Your First Review
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <div class="settings-container">
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h2 class="settings-title">Personal Information</h2>
+                            <p class="settings-description">Update your personal details and preferences</p>
+                        </div>
+                        
+                        <form id="personalInfoForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Display Name</label>
+                                    <input type="text" class="form-input" id="displayName" placeholder="Enter your name">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-input" id="email" placeholder="Enter your email">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-input" id="phone" placeholder="Enter your phone number">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Date of Birth</label>
+                                    <input type="date" class="form-input" id="birthdate">
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Favorite Genre</label>
+                                        <select class="form-select" id="favoriteGenre">
+                                            <option value="">Select a genre</option>
+                                            <option value="Action">Action</option>
+                                            <option value="Comedy">Comedy</option>
+                                            <option value="Drama">Drama</option>
+                                            <option value="Horror">Horror</option>
+                                            <option value="Sci-Fi">Sci-Fi</option>
+                                            <option value="Romance">Romance</option>
+                                            <option value="Animation">Animation</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Preferred Cinema</label>
+                                        <select class="form-select" id="preferredCinema">
+                                            <option value="">No preference</option>
+                                            <!-- Options will be populated by JavaScript -->
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-actions">
+                                <button type="button" class="btn btn-ghost" onclick="resetPersonalInfo()">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h2 class="settings-title">Notification Preferences</h2>
+                            <p class="settings-description">Choose how you want to receive updates</p>
+                        </div>
+                        
+                        <form id="notificationsForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <input type="checkbox" id="emailNotifications" checked>
+                                        Email Notifications
+                                    </label>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <input type="checkbox" id="bookingReminders" checked>
+                                        Booking Reminders
+                                    </label>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <input type="checkbox" id="newMovies">
+                                        New Movie Alerts
+                                    </label>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <input type="checkbox" id="specialOffers">
+                                        Special Offers & Promotions
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-actions">
+                                <button type="submit" class="btn btn-primary">Update Preferences</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="settings-card">
+                        <div class="settings-header">
+                            <h2 class="settings-title">Privacy & Security</h2>
+                            <p class="settings-description">Manage your privacy settings and account security</p>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" class="form-input" id="currentPassword" placeholder="Enter current password">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-input" id="newPassword" placeholder="Enter new password">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-input" id="confirmPassword" placeholder="Confirm new password">
+                            </div>
+                        </div>
+                        
+                        <div class="settings-actions">
+                            <button class="btn btn-primary" onclick="updatePassword()">Update Password</button>
+                        </div>
+                    </div>
+
+                    <div class="danger-zone">
+                        <div class="danger-header">
+                            <i class="fas fa-exclamation-triangle danger-icon"></i>
+                            <h3 class="danger-title">Danger Zone</h3>
+                        </div>
+                        
+                        <p class="danger-text">
+                            These actions are irreversible. Please be careful with these options.
+                        </p>
+                        
+                        <div class="danger-actions">
+                            <button class="btn btn-ghost" onclick="exportData()">
+                                <i class="fas fa-download"></i>
+                                Export My Data
+                            </button>
+                            <button class="btn btn-outline" onclick="deleteAccount()">
+                                <i class="fas fa-trash"></i>
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/data.js"></script>
+    <script>
+        // Global variables
+        let cinemaData;
+        let currentUser = null;
+        let userData = null;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeProfile();
+        });
+
+        function initializeProfile() {
+            cinemaData = new CinemaData();
+            loadUserData();
+            setupEventListeners();
+            renderProfileData();
+            populateCinemaOptions();
+        }
+
+        function loadUserData() {
+            const username = localStorage.getItem('loggedInUser');
+            if (!username) {
+                // Redirect to login if not logged in
+                window.location.href = 'index.html';
+                return;
+            }
+
+            currentUser = username;
+            
+            // Load user data from localStorage
+            const users = JSON.parse(localStorage.getItem('cinemaUsers') || '{}');
+            userData = users[username] || {
+                username,
+                email: '',
+                displayName: username,
+                bookings: [],
+                favorites: [],
+                reviews: [],
+                settings: {},
+                registeredAt: new Date().toISOString()
+            };
+        }
+
+        function renderProfileData() {
+            // Update header information
+            document.getElementById('profileName').textContent = userData.displayName || currentUser;
+            document.getElementById('profileEmail').textContent = userData.email || 'user@example.com';
+            document.getElementById('profileAvatar').innerHTML = `
+                <i class="fas fa-user"></i>
+            `;
+
+            // Update statistics
+            document.getElementById('totalBookings').textContent = userData.bookings?.length || 0;
+            document.getElementById('totalFavorites').textContent = userData.favorites?.length || 0;
+            document.getElementById('totalReviews').textContent = userData.reviews?.length || 0;
+            
+            const memberYear = new Date(userData.registeredAt).getFullYear();
+            document.getElementById('memberSince').textContent = memberYear;
+
+            // Update badges
+            document.getElementById('bookingsBadge').textContent = userData.bookings?.length || 0;
+            document.getElementById('favoritesBadge').textContent = userData.favorites?.length || 0;
+
+            // Update dashboard stats
+            updateDashboardStats();
+            renderRecentActivity();
+            renderBookings();
+            renderFavorites();
+            renderReviews();
+
+            // Load settings
+            loadSettings();
+        }
+
+        function updateDashboardStats() {
+            const bookings = userData.bookings || [];
+            const reviews = userData.reviews || [];
+            
+            // Movies watched (unique movies)
+            const uniqueMovies = new Set(bookings.map(b => b.movie)).size;
+            document.getElementById('moviesWatched').textContent = uniqueMovies;
+            
+            // Total spent
+            const totalSpent = bookings.reduce((sum, booking) => sum + (booking.total || 0), 0);
+            document.getElementById('totalSpent').textContent = `$${totalSpent}`;
+            
+            // Favorite genre (from user settings or most common)
+            const favoriteGenre = userData.settings?.favoriteGenre || 'N/A';
+            document.getElementById('favoriteGenre').textContent = favoriteGenre;
+            
+            // This month's bookings
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            const thisMonthBookings = bookings.filter(booking => {
+                const bookingDate = new Date(booking.bookedAt);
+                return bookingDate.getMonth() === currentMonth && bookingDate.getFullYear() === currentYear;
+            }).length;
+            document.getElementById('thisMonth').textContent = thisMonthBookings;
+        }
+
+        function renderRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            const activities = [];
+            
+            // Add recent bookings
+            (userData.bookings || []).forEach(booking => {
+                activities.push({
+                    type: 'booking',
+                    text: `Booked tickets for "${booking.movie}"`,
+                    time: booking.bookedAt,
+                    icon: 'fa-ticket-alt'
+                });
+            });
+            
+            // Add recent reviews
+            (userData.reviews || []).forEach(review => {
+                activities.push({
+                    type: 'review',
+                    text: `Reviewed "${review.movieTitle}"`,
+                    time: review.date,
+                    icon: 'fa-star'
+                });
+            });
+            
+            // Sort by date (most recent first)
+            activities.sort((a, b) => new Date(b.time) - new Date(a.time));
+            
+            if (activities.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <h3 class="empty-title">No Recent Activity</h3>
+                        <p class="empty-text">Start booking movies to see your activity here!</p>
+                        <button class="btn btn-primary" onclick="window.location.href='index.html'">
+                            <i class="fas fa-film"></i>
+                            Browse Movies
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = activities.slice(0, 5).map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas ${activity.icon}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-text">${activity.text}</div>
+                        <div class="activity-time">${formatDate(activity.time)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderBookings() {
+            const container = document.getElementById('bookingsList');
+            const bookings = userData.bookings || [];
+            
+            if (bookings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <h3 class="empty-title">No Bookings Yet</h3>
+                        <p class="empty-text">Your booking history will appear here once you start booking movies!</p>
+                        <button class="btn btn-primary" onclick="window.location.href='index.html'">
+                            <i class="fas fa-film"></i>
+                            Book Your First Movie
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = bookings.map(booking => `
+                <div class="booking-card">
+                    <div class="booking-header">
+                        <div class="booking-title">${booking.movie}</div>
+                        <div class="booking-status ${booking.status === 'completed' ? 'completed' : 'upcoming'}">
+                            ${booking.status || 'Upcoming'}
+                        </div>
+                    </div>
+                    
+                    <div class="booking-body">
+                        <div class="booking-details">
+                            <div class="detail-item">
+                                <i class="fas fa-theater-masks detail-icon"></i>
+                                ${booking.cinema}
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-calendar detail-icon"></i>
+                                ${booking.date || 'Today'}
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock detail-icon"></i>
+                                ${booking.time}
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-couch detail-icon"></i>
+                                ${booking.seats || 'N/A'}
+                            </div>
+                        </div>
+                        
+                        <div class="booking-actions">
+                            <button class="btn btn-outline" onclick="viewBookingDetails('${booking.id}')">
+                                View Details
+                            </button>
+                            ${booking.status === 'upcoming' ? `
+                                <button class="btn btn-ghost" onclick="cancelBooking('${booking.id}')">
+                                    Cancel
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderFavorites() {
+            const container = document.getElementById('favoritesList');
+            const favorites = userData.favorites || [];
+            
+            if (favorites.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3 class="empty-title">No Favorites Yet</h3>
+                        <p class="empty-text">Start adding movies to your favorites to see them here!</p>
+                        <button class="btn btn-primary" onclick="window.location.href='index.html'">
+                            <i class="fas fa-film"></i>
+                            Discover Movies
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = favorites.map(favorite => {
+                const movie = cinemaData.getMovieById(favorite.movieId);
+                if (!movie) return '';
+                
+                return `
+                    <div class="favorite-card" onclick="viewMovieDetails('${movie.id}')">
+                        <img src="${movie.poster}" alt="${movie.title}" class="favorite-poster">
+                        <div class="favorite-body">
+                            <div class="favorite-title">${movie.title}</div>
+                            <div class="favorite-meta">
+                                <div class="favorite-rating">
+                                    <i class="fas fa-star"></i>
+                                    ${movie.rating}
+                                </div>
+                                <div class="favorite-genre">${movie.genre}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderReviews() {
+            const container = document.getElementById('reviewsList');
+            const reviews = userData.reviews || [];
+            
+            if (reviews.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3 class="empty-title">No Reviews Yet</h3>
+                        <p class="empty-text">Share your thoughts about movies you've watched!</p>
+                        <button class="btn btn-primary" onclick="window.location.href='index.html'">
+                            <i class="fas fa-film"></i>
+                            Write Your First Review
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = reviews.map(review => `
+                <div class="booking-card">
+                    <div class="booking-header">
+                        <div class="booking-title">${review.movieTitle}</div>
+                        <div class="booking-rating">
+                            ${generateStars(review.rating)} ${review.rating}
+                        </div>
+                    </div>
+                    
+                    <div class="booking-body">
+                        <p>${review.text}</p>
+                        <div class="booking-actions">
+                            <button class="btn btn-outline" onclick="editReview('${review.id}')">
+                                Edit
+                            </button>
+                            <button class="btn btn-ghost" onclick="deleteReview('${review.id}')">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function switchTab(tabName) {
+            // Update nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update content sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function loadSettings() {
+            const settings = userData.settings || {};
+            
+            document.getElementById('displayName').value = settings.displayName || currentUser;
+            document.getElementById('email').value = settings.email || '';
+            document.getElementById('phone').value = settings.phone || '';
+            document.getElementById('favoriteGenre').value = settings.favoriteGenre || '';
+            document.getElementById('preferredCinema').value = settings.preferredCinema || '';
+            document.getElementById('birthdate').value = settings.birthdate || '';
+            
+            document.getElementById('emailNotifications').checked = settings.emailNotifications !== false;
+            document.getElementById('bookingReminders').checked = settings.bookingReminders !== false;
+            document.getElementById('newMovies').checked = settings.newMovies || false;
+            document.getElementById('specialOffers').checked = settings.specialOffers || false;
+        }
+
+        function populateCinemaOptions() {
+            const select = document.getElementById('preferredCinema');
+            cinemaData.cinemas.forEach(cinema => {
+                const option = document.createElement('option');
+                option.value = cinema.id;
+                option.textContent = cinema.name;
+                select.appendChild(option);
+            });
+        }
+
+        function setupEventListeners() {
+            // Personal info form
+            document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                savePersonalInfo();
+            });
+
+            // Notifications form
+            document.getElementById('notificationsForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveNotificationPreferences();
+            });
+        }
+
+        function savePersonalInfo() {
+            userData.settings = {
+                ...userData.settings,
+                displayName: document.getElementById('displayName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                favoriteGenre: document.getElementById('favoriteGenre').value,
+                preferredCinema: document.getElementById('preferredCinema').value,
+                birthdate: document.getElementById('birthdate').value
+            };
+            
+            saveUserData();
+            renderProfileData();
+            alert('Personal information updated successfully!');
+        }
+
+        function saveNotificationPreferences() {
+            userData.settings = {
+                ...userData.settings,
+                emailNotifications: document.getElementById('emailNotifications').checked,
+                bookingReminders: document.getElementById('bookingReminders').checked,
+                newMovies: document.getElementById('newMovies').checked,
+                specialOffers: document.getElementById('specialOffers').checked
+            };
+            
+            saveUserData();
+            alert('Notification preferences updated successfully!');
+        }
+
+        function updatePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('Please fill in all password fields');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match');
+                return;
+            }
+            
+            if (newPassword.length < 4) {
+                alert('Password must be at least 4 characters');
+                return;
+            }
+            
+            // Update password (simplified - in production, this would be server-side)
+            userData.password = newPassword;
+            saveUserData();
+            
+            // Clear form
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            
+            alert('Password updated successfully!');
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(userData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cinema-finder-data-${currentUser}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function deleteAccount() {
+            if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                return;
+            }
+            
+            if (!confirm('This will permanently delete all your data including bookings, favorites, and reviews. Are you absolutely sure?')) {
+                return;
+            }
+            
+            // Delete user data
+            const users = JSON.parse(localStorage.getItem('cinemaUsers') || '{}');
+            delete users[currentUser];
+            localStorage.setItem('cinemaUsers', JSON.stringify(users));
+            
+            // Logout and redirect
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'index.html';
+        }
+
+        function saveUserData() {
+            const users = JSON.parse(localStorage.getItem('cinemaUsers') || '{}');
+            users[currentUser] = userData;
+            localStorage.setItem('cinemaUsers', JSON.stringify(users));
+        }
+
+        function generateStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<i class="fas fa-star"></i>';
+                } else {
+                    stars += '<i class="far fa-star"></i>';
+                }
+            }
+            return stars;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return 'Yesterday';
+            if (diffDays < 7) return `${diffDays} days ago`;
+            if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+            if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+            return `${Math.floor(diffDays / 365)} years ago`;
+        }
+
+        function viewBookingDetails(bookingId) {
+            // In a real app, this would open a detailed view
+            alert('Viewing booking details...');
+        }
+
+        function cancelBooking(bookingId) {
+            if (confirm('Are you sure you want to cancel this booking?')) {
+                // Remove booking
+                userData.bookings = userData.bookings.filter(b => b.id !== bookingId);
+                saveUserData();
+                renderBookings();
+                renderProfileData();
+                alert('Booking cancelled successfully');
+            }
+        }
+
+        function viewMovieDetails(movieId) {
+            // In a real app, this would navigate to movie details
+            window.location.href = `index.html?movie=${movieId}`;
+        }
+
+        function editReview(reviewId) {
+            // In a real app, this would open edit form
+            alert('Editing review...');
+        }
+
+        function deleteReview(reviewId) {
+            if (confirm('Are you sure you want to delete this review?')) {
+                userData.reviews = userData.reviews.filter(r => r.id !== reviewId);
+                saveUserData();
+                renderReviews();
+                renderProfileData();
+                alert('Review deleted successfully');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinema Finder - Discover Movies & Cinemas</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/main.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Additional page-specific styles */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: var(--z-sticky);
+        }
+        
+        .navbar-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-4) var(--space-6);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            text-decoration: none;
+            color: var(--neutral-900);
+            font-weight: var(--font-bold);
+            font-size: var(--text-xl);
+        }
+        
+        .logo i {
+            color: var(--primary-500);
+            font-size: var(--text-2xl);
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: var(--space-6);
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: var(--neutral-700);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            transition: color var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-600);
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: var(--space-3);
+            align-items: center;
+        }
+        
+        .hero {
+            background: var(--gradient-dark);
+            color: white;
+            padding: var(--space-16) 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1920') center/cover;
+            opacity: 0.2;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .featured-section {
+            background: var(--gradient-dark);
+            color: white;
+            padding: var(--space-12) 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .featured-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1920') center/cover;
+            opacity: 0.2;
+        }
+        
+        .featured-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .featured-movies {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-8);
+            margin-top: var(--space-8);
+        }
+        
+        .featured-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            transition: all var(--transition-normal);
+            cursor: pointer;
+        }
+        
+        .featured-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-2xl);
+        }
+        
+        .featured-poster {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .featured-info {
+            padding: var(--space-4);
+        }
+        
+        .featured-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-2);
+        }
+        
+        .featured-meta {
+            display: flex;
+            gap: var(--space-4);
+            font-size: var(--text-sm);
+            opacity: 0.9;
+            margin-bottom: var(--space-3);
+        }
+        
+        .featured-description {
+            font-size: var(--text-sm);
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+        
+        .now-showing {
+            padding: var(--space-16) 0;
+            background: white;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+        }
+        
+        .section-title {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--neutral-900);
+        }
+        
+        .view-all-btn {
+            color: var(--primary-600);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            transition: gap var(--transition-fast);
+        }
+        
+        .view-all-btn:hover {
+            gap: var(--space-3);
+        }
+        
+        .movie-row {
+            display: flex;
+            gap: var(--space-6);
+            overflow-x: auto;
+            padding-bottom: var(--space-4);
+            scrollbar-width: thin;
+            scrollbar-color: var(--neutral-300) transparent;
+        }
+        
+        .movie-row::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .movie-row::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .movie-row::-webkit-scrollbar-thumb {
+            background: var(--neutral-300);
+            border-radius: var(--radius-full);
+        }
+        
+        .movie-card {
+            min-width: 200px;
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-fast);
+            cursor: pointer;
+        }
+        
+        .movie-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .movie-poster {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        
+        .movie-details {
+            padding: var(--space-4);
+        }
+        
+        .movie-title {
+            font-weight: var(--font-semibold);
+            color: var(--neutral-900);
+            margin-bottom: var(--space-2);
+            font-size: var(--text-base);
+        }
+        
+        .movie-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: var(--text-sm);
+            color: var(--neutral-600);
+        }
+        
+        /* Enhanced Search Results */
+        .search-results {
+            padding: var(--space-16) 0;
+            background: white;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: var(--space-8);
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition-normal);
+            cursor: pointer;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .result-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: var(--space-6);
+        }
+        
+        .result-type {
+            display: inline-block;
+            padding: var(--space-1) var(--space-3);
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: var(--font-medium);
+            margin-bottom: var(--space-3);
+        }
+        
+        .result-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-2);
+        }
+        
+        .result-subtitle {
+            opacity: 0.9;
+            font-size: var(--text-sm);
+        }
+        
+        .result-body {
+            padding: var(--space-6);
+        }
+        
+        .result-meta {
+            display: flex;
+            gap: var(--space-4);
+            margin-bottom: var(--space-4);
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            color: var(--neutral-600);
+            font-size: var(--text-sm);
+        }
+        
+        .result-description {
+            color: var(--neutral-700);
+            line-height: 1.6;
+            margin-bottom: var(--space-4);
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+        
+        /* Movie Details Modal */
+        .movie-details-modal .modal-content {
+            max-width: 800px;
+        }
+        
+        .movie-details-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: var(--space-6);
+        }
+        
+        .movie-poster-large {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+            border-radius: var(--radius-lg);
+        }
+        
+        .movie-info-panel {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+        }
+        
+        .movie-header-info {
+            border-bottom: 1px solid var(--neutral-200);
+            padding-bottom: var(--space-4);
+        }
+        
+        .movie-title-large {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--neutral-900);
+            margin-bottom: var(--space-2);
+        }
+        
+        .movie-badges {
+            display: flex;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+            margin-bottom: var(--space-4);
+        }
+        
+        .movie-badge {
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+        
+        .movie-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-4);
+        }
+        
+        .detail-row {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+        
+        .detail-label {
+            font-size: var(--text-sm);
+            color: var(--neutral-600);
+            font-weight: var(--font-medium);
+        }
+        
+        .detail-value {
+            font-size: var(--text-base);
+            color: var(--neutral-900);
+            font-weight: var(--font-semibold);
+        }
+        
+        .cast-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+            margin-top: var(--space-2);
+        }
+        
+        .cast-member {
+            background: var(--neutral-100);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            color: var(--neutral-700);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .navbar-content {
+                flex-direction: column;
+                gap: var(--space-4);
+            }
+            
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: var(--space-4);
+            }
+            
+            .featured-movies {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: var(--space-4);
+                align-items: flex-start;
+            }
+            
+            .movie-details-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .movie-poster-large {
+                height: 300px;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="index.html" class="logo">
+                <i class="fas fa-film"></i>
+                Cinema Finder
+            </a>
+            
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    Home
+                </a>
+                <a href="locations.html" class="nav-link">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Locations
+                </a>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="btn btn-ghost" onclick="toggleSearch()">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="btn btn-primary" onclick="openAuth()">
+                    Sign In
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content text-center">
+                <h1>Discover Amazing Movies</h1>
+                <p>Book tickets at the best cinemas near you with just a few clicks</p>
+                
+                <div class="search-container">
+                    <div class="search-bar">
+                        <input type="text" class="search-input" id="mainSearch" placeholder="Search movies, cinemas, or genres...">
+                        <button class="btn btn-primary" onclick="performSearch()">
+                            <i class="fas fa-search"></i>
+                            Search
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="filter-chips">
+                    <div class="chip" onclick="filterByGenre('Action')">Action</div>
+                    <div class="chip" onclick="filterByGenre('Comedy')">Comedy</div>
+                    <div class="chip" onclick="filterByGenre('Sci-Fi')">Sci-Fi</div>
+                    <div class="chip" onclick="filterByGenre('Drama')">Drama</div>
+                    <div class="chip" onclick="filterByGenre('Animation')">Animation</div>
+                    <div class="chip" onclick="filterByGenre('Horror')">Horror</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Movies -->
+    <section class="featured-section">
+        <div class="container">
+            <div class="featured-content">
+                <div class="text-center mb-8">
+                    <h2 style="font-size: var(--text-3xl); font-weight: var(--font-bold); margin-bottom: var(--space-4);">
+                        Featured Blockbusters
+                    </h2>
+                    <p style="opacity: 0.9; font-size: var(--text-lg);">
+                        Don't miss this week's hottest movies
+                    </p>
+                </div>
+                
+                <div class="featured-movies" id="featuredMovies">
+                    <!-- Featured movies will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Now Showing -->
+    <section class="now-showing">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Now Showing</h2>
+                <a href="#" class="view-all-btn">
+                    View All
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="movie-row" id="nowShowingMovies">
+                <!-- Now showing movies will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Results (Hidden by default) -->
+    <section class="search-results" id="searchResults" style="display: none;">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" id="resultsTitle">Search Results</h2>
+                <button class="btn btn-ghost" onclick="clearSearch()">
+                    <i class="fas fa-times"></i>
+                    Clear Search
+                </button>
+            </div>
+            
+            <div class="results-grid" id="resultsGrid">
+                <!-- Results will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Movie Details Modal -->
+    <div class="modal" id="movieDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detailsModalTitle">Movie Details</h2>
+                <button class="btn btn-ghost" onclick="closeMovieDetails()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="movie-details-content" id="movieDetailsContent">
+                    <!-- Movie details will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <div class="booking-header">
+                <h2>Book Your Tickets</h2>
+                <button class="btn btn-ghost" onclick="closeModal('bookingModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="booking-details" id="bookingDetails">
+                    <!-- Booking details will be populated -->
+                </div>
+                
+                <div class="seats-section">
+                    <div class="screen">SCREEN</div>
+                    <div class="seats-grid" id="seatsGrid">
+                        <!-- Seats will be generated -->
+                    </div>
+                </div>
+                
+                <div class="concessions-section">
+                    <h3>Add Snacks & Drinks</h3>
+                    <div class="concessions-grid" id="concessionsGrid">
+                        <!-- Concessions will be populated -->
+                    </div>
+                </div>
+                
+                <div class="promo-section">
+                    <h3>Promo Code</h3>
+                    <div class="promo-container">
+                        <input type="text" class="promo-input" id="promoCode" placeholder="Enter promo code">
+                        <button class="btn btn-secondary" onclick="applyPromoCode()">Apply</button>
+                    </div>
+                </div>
+                
+                <div class="booking-summary">
+                    <div class="summary-row">
+                        <span>Selected Seats:</span>
+                        <span id="selectedSeatsDisplay">None</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Ticket Price:</span>
+                        <span id="ticketPrice">$0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Concessions:</span>
+                        <span id="concessionsPrice">$0</span>
+                    </div>
+                    <div class="summary-row discount" id="discountRow" style="display: none;">
+                        <span>Discount:</span>
+                        <span id="discountAmount" style="color: var(--accent-600);">-$0</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="totalPrice">$0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('bookingModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmBooking()">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="authTitle">Sign In</h2>
+                <button class="btn btn-ghost" onclick="closeModal('authModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-input" id="loginUsername" placeholder="Enter your username">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password">
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width: 100%; margin-bottom: var(--space-4);" onclick="login()">
+                        Sign In
+                    </button>
+                    
+                    <div style="text-align: center;">
+                        <span style="color: var(--neutral-600);">Don't have an account? </span>
+                        <a href="#" onclick="showRegister()" style="color: var(--primary-600); font-weight: var(--font-medium);">Sign Up</a>
+                    </div>
+                </div>
+                
+                <div id="registerForm" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-input" id="regUsername" placeholder="Choose a username">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="regEmail" placeholder="Enter your email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="regPassword" placeholder="Create a password">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" class="form-input" id="regConfirmPassword" placeholder="Confirm your password">
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width: 100%; margin-bottom: var(--space-4);" onclick="register()">
+                        Sign Up
+                    </button>
+                    
+                    <div style="text-align: center;">
+                        <span style="color: var(--neutral-600);">Already have an account? </span>
+                        <a href="#" onclick="showLogin()" style="color: var(--primary-600); font-weight: var(--font-medium);">Sign In</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/data.js"></script>
+    <script>
+        // Global variables
+        let cinemaData;
+        let currentUser = null;
+        let selectedSeats = [];
+        let selectedConcessions = {};
+        let currentBooking = null;
+        let appliedPromo = null;
+        
+        // Concessions data
+        const concessions = [
+            { id: 'popcorn_small', name: 'Popcorn (Small)', icon: '🍿', price: 5 },
+            { id: 'popcorn_medium', name: 'Popcorn (Medium)', icon: '🍿', price: 7 },
+            { id: 'popcorn_large', name: 'Popcorn (Large)', icon: '🍿', price: 9 },
+            { id: 'soda_small', name: 'Soda (Small)', icon: '🥤', price: 4 },
+            { id: 'soda_medium', name: 'Soda (Medium)', icon: '🥤', price: 5 },
+            { id: 'soda_large', name: 'Soda (Large)', icon: '🥤', price: 6 },
+            { id: 'candy', name: 'Candy', icon: '🍬', price: 3 },
+            { id: 'nachos', name: 'Nachos', icon: '🌮', price: 8 },
+            { id: 'hotdog', name: 'Hot Dog', icon: '🌭', price: 6 },
+            { id: 'water', name: 'Water', icon: '💧', price: 3 },
+            { id: 'combo', name: 'Combo Deal', icon: '🎁', price: 12 }
+        ];
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            console.log('Initializing app...');
+            cinemaData = new CinemaData();
+            console.log('CinemaData initialized:', cinemaData);
+            
+            // Wait for data to be loaded
+            setTimeout(() => {
+                console.log('Data loaded, rendering content...');
+                loadUserData();
+                renderFeaturedMovies();
+                renderNowShowing();
+                setupEventListeners();
+            }, 100);
+        }
+
+        function loadUserData() {
+            const user = localStorage.getItem('loggedInUser');
+            if (user) {
+                currentUser = user;
+                updateAuthUI();
+            }
+        }
+
+        function renderFeaturedMovies() {
+            const featuredMovies = cinemaData.movies
+                .filter(movie => movie.rating >= 8.0)
+                .slice(0, 6);
+            
+            const container = document.getElementById('featuredMovies');
+            container.innerHTML = featuredMovies.map(movie => `
+                <div class="featured-card" onclick="viewMovieDetails('${movie.id}')">
+                    <img src="${movie.poster}" alt="${movie.title}" class="featured-poster">
+                    <div class="featured-info">
+                        <div class="featured-title">${movie.title}</div>
+                        <div class="featured-meta">
+                            <span><i class="fas fa-star"></i> ${movie.rating}</span>
+                            <span><i class="fas fa-clock"></i> ${movie.duration}</span>
+                        </div>
+                        <div class="featured-description">${movie.description.substring(0, 100)}...</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderNowShowing() {
+            const nowShowing = cinemaData.movies.slice(0, 10);
+            
+            const container = document.getElementById('nowShowingMovies');
+            container.innerHTML = nowShowing.map(movie => `
+                <div class="movie-card" onclick="viewMovieDetails('${movie.id}')">
+                    <img src="${movie.poster}" alt="${movie.title}" class="movie-poster">
+                    <div class="movie-details">
+                        <div class="movie-title">${movie.title}</div>
+                        <div class="movie-info">
+                            <span><i class="fas fa-star"></i> ${movie.rating}</span>
+                            <span>${movie.duration}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewMovieDetails(movieId) {
+            const movie = cinemaData.getMovieById(movieId);
+            if (!movie) return;
+            
+            const modal = document.getElementById('movieDetailsModal');
+            document.getElementById('detailsModalTitle').textContent = movie.title;
+            
+            const content = document.getElementById('movieDetailsContent');
+            content.innerHTML = `
+                <img src="${movie.poster}" alt="${movie.title}" class="movie-poster-large">
+                
+                <div class="movie-info-panel">
+                    <div class="movie-header-info">
+                        <h3 class="movie-title-large">${movie.title}</h3>
+                        
+                        <div class="movie-badges">
+                            <span class="movie-badge badge-primary">${movie.genre}</span>
+                            <span class="movie-badge badge-secondary">${movie.classification}</span>
+                            <span class="movie-badge badge-success">${movie.duration}</span>
+                        </div>
+                        
+                        <div class="result-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-star"></i>
+                                <span>Rating: ${movie.rating}/10</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Released: ${movie.releaseDate}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="movie-description">
+                        <h4 style="margin-bottom: var(--space-3);">About</h4>
+                        <p>${movie.description}</p>
+                    </div>
+                    
+                    <div class="movie-details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">Director:</span>
+                            <span class="detail-value">${movie.director}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Cast:</span>
+                            <div class="cast-list">
+                                ${movie.cast.map(actor => `
+                                    <span class="cast-member">${actor}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-actions">
+                        <button class="btn btn-primary" onclick="openBookingFromMovie('${movie.id}')">
+                            <i class="fas fa-ticket-alt"></i>
+                            Book Tickets
+                        </button>
+                        <button class="btn btn-secondary" onclick="playTrailer('${movie.trailer}')">
+                            <i class="fas fa-play"></i>
+                            Watch Trailer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeMovieDetails() {
+            document.getElementById('movieDetailsModal').classList.remove('active');
+        }
+
+        function performSearch() {
+            const query = document.getElementById('mainSearch').value.trim();
+            if (!query) {
+                clearSearch();
+                return;
+            }
+            
+            console.log('Searching for:', query); // Debug log
+            console.log('Movies available:', cinemaData?.movies); // Debug log
+            
+            // Hide main sections
+            document.querySelector('.hero').style.display = 'none';
+            document.querySelector('.featured-section').style.display = 'none';
+            document.querySelector('.now-showing').style.display = 'none';
+            
+            // Show search results
+            const searchSection = document.getElementById('searchResults');
+            searchSection.style.display = 'block';
+            
+            // Update title
+            document.getElementById('resultsTitle').textContent = `Search Results for "${query}"`;
+            
+            // Perform search
+            const results = searchContent(query);
+            console.log('Search results:', results); // Debug log
+            
+            // Render results
+            const container = document.getElementById('resultsGrid');
+            
+            if (results.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="empty-title">No results found</h3>
+                        <p class="empty-text">Try searching with different keywords</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = results.map(result => `
+                <div class="result-card" onclick="${result.action}">
+                    <div class="result-header">
+                        <div class="result-type">${result.type}</div>
+                        <div class="result-title">${result.title}</div>
+                        <div class="result-subtitle">${result.subtitle}</div>
+                    </div>
+                    
+                    <div class="result-body">
+                        <div class="result-meta">
+                            ${result.meta}
+                        </div>
+                        <div class="result-description">${result.description}</div>
+                        
+                        <div class="result-actions">
+                            ${result.actions}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function searchContent(query) {
+            const lowercaseQuery = query.toLowerCase();
+            const results = [];
+            
+            console.log('Searching movies:', cinemaData.movies.length, 'movies'); // Debug
+            console.log('Searching cinemas:', cinemaData.cinemas.length, 'cinemas'); // Debug
+            
+            // Search movies
+            if (cinemaData && cinemaData.movies) {
+                cinemaData.movies.forEach(movie => {
+                    console.log('Checking movie:', movie.title, movie.director); // Debug
+                    if (movie.title.toLowerCase().includes(lowercaseQuery) ||
+                        movie.genre.toLowerCase().includes(lowercaseQuery) ||
+                        (movie.director && movie.director.toLowerCase && movie.director.toLowerCase().includes(lowercaseQuery)) ||
+                        (movie.cast && Array.isArray(movie.cast) && movie.cast.some(actor => actor.toLowerCase().includes(lowercaseQuery)))) {
+                        
+                        console.log('Found movie match:', movie.title); // Debug
+                        
+                        results.push({
+                            type: 'Movie',
+                            title: movie.title,
+                            subtitle: movie.genre,
+                            description: movie.description,
+                            meta: `
+                                <div class="meta-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>Rating: ${movie.rating}/10</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>${movie.duration}</span>
+                                </div>
+                            `,
+                            action: `viewMovieDetails('${movie.id}')`,
+                            actions: `
+                                <button class="btn btn-primary" onclick="event.stopPropagation(); openBookingFromMovie('${movie.id}')">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    Book Tickets
+                                </button>
+                                <button class="btn btn-secondary" onclick="event.stopPropagation(); playTrailer('${movie.trailer}')">
+                                    <i class="fas fa-play"></i>
+                                    Watch Trailer
+                                </button>
+                            `
+                        });
+                    }
+                });
+            }
+            
+            // Search cinemas
+            if (cinemaData && cinemaData.cinemas) {
+                cinemaData.cinemas.forEach(cinema => {
+                    if (cinema.name.toLowerCase().includes(lowercaseQuery) ||
+                        cinema.location.toLowerCase().includes(lowercaseQuery) ||
+                        cinema.amenities.some(amenity => amenity.toLowerCase().includes(lowercaseQuery))) {
+                        
+                        results.push({
+                            type: 'Cinema',
+                            title: cinema.name,
+                            subtitle: 'Cinema',
+                            description: `${cinema.location} • Rating: ${cinema.rating}/5 • ${cinema.amenities.slice(0, 3).join(', ')}`,
+                            meta: `
+                                <div class="meta-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>${cinema.location}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>Rating: ${cinema.rating}/5</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-th-large"></i>
+                                    <span>${cinema.amenities.length} Amenities</span>
+                                </div>
+                            `,
+                            action: `window.location.href='locations.html'`,
+                            actions: `
+                                <button class="btn btn-primary" onclick="event.stopPropagation(); window.location.href='locations.html'">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    View Location
+                                </button>
+                            `
+                        });
+                    }
+                });
+            }
+            
+            console.log('Total results found:', results.length); // Debug
+            return results;
+        }
+
+        function clearSearch() {
+            // Show main sections
+            document.querySelector('.hero').style.display = 'block';
+            document.querySelector('.featured-section').style.display = 'block';
+            document.querySelector('.now-showing').style.display = 'block';
+            
+            // Hide search results
+            document.getElementById('searchResults').style.display = 'none';
+            
+            // Clear search input
+            document.getElementById('mainSearch').value = '';
+        }
+
+        function filterByGenre(genre) {
+            const query = genre.toLowerCase();
+            
+            console.log('Filtering by genre:', genre); // Debug
+            console.log('Available movies:', cinemaData?.movies); // Debug
+            
+            // Hide main sections
+            document.querySelector('.hero').style.display = 'none';
+            document.querySelector('.featured-section').style.display = 'none';
+            document.querySelector('.now-showing').style.display = 'none';
+            
+            // Show search results
+            const searchSection = document.getElementById('searchResults');
+            searchSection.style.display = 'block';
+            
+            // Update title
+            document.getElementById('resultsTitle').textContent = `${genre} Movies`;
+            
+            // Filter movies by genre
+            let filteredMovies = [];
+            if (cinemaData && cinemaData.movies) {
+                filteredMovies = cinemaData.getMoviesByGenre(genre);
+                console.log('Genre filter results:', filteredMovies); // Debug
+            }
+            
+            // Render results
+            const container = document.getElementById('resultsGrid');
+            
+            if (filteredMovies.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <h3 class="empty-title">No ${genre} movies found</h3>
+                        <p class="empty-text">Try browsing other genres</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filteredMovies.map(movie => `
+                <div class="result-card" onclick="viewMovieDetails('${movie.id}')">
+                    <div class="result-header">
+                        <div class="result-type">Movie</div>
+                        <div class="result-title">${movie.title}</div>
+                        <div class="result-subtitle">${movie.genre}</div>
+                    </div>
+                    
+                    <div class="result-body">
+                        <div class="result-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-star"></i>
+                                <span>Rating: ${movie.rating}/10</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>${movie.duration}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Released: ${movie.releaseDate}</span>
+                            </div>
+                        </div>
+                        <div class="result-description">${movie.description}</div>
+                        
+                        <div class="result-actions">
+                            <button class="btn btn-primary" onclick="event.stopPropagation(); openBookingFromMovie('${movie.id}')">
+                                <i class="fas fa-ticket-alt"></i>
+                                Book Tickets
+                            </button>
+                            <button class="btn btn-secondary" onclick="event.stopPropagation(); playTrailer('${movie.trailer}')">
+                                <i class="fas fa-play"></i>
+                                Watch Trailer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openBookingFromMovie(movieId) {
+            const movie = cinemaData.getMovieById(movieId);
+            if (movie) {
+                closeMovieDetails();
+                
+                // For now, just show a simple booking modal with the movie info
+                // In a real app, this would show cinema selection
+                currentBooking = { 
+                    movie: movie.title,
+                    movieId: movieId,
+                    cinema: 'Select Cinema'
+                };
+                
+                const modal = document.getElementById('bookingModal');
+                document.getElementById('bookingDetails').innerHTML = `
+                    <div class="booking-summary">
+                        <h3>${movie.title}</h3>
+                        <p>Genre: ${movie.genre}</p>
+                        <p>Rating: ${movie.rating}/10</p>
+                        <p>Duration: ${movie.duration}</p>
+                    </div>
+                `;
+                
+                generateSeats();
+                renderConcessions();
+                modal.classList.add('active');
+            }
+        }
+
+        function playTrailer(trailerUrl) {
+            window.open(trailerUrl, '_blank');
+        }
+
+        function generateSeats() {
+            const seatsGrid = document.getElementById('seatsGrid');
+            seatsGrid.innerHTML = '';
+            
+            for (let row = 0; row < 6; row++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'seat-row';
+                
+                for (let seat = 0; seat < 8; seat++) {
+                    const seatBtn = document.createElement('button');
+                    const seatId = String.fromCharCode(65 + row) + (seat + 1);
+                    seatBtn.className = 'seat-btn';
+                    seatBtn.textContent = seatId;
+                    seatBtn.onclick = () => toggleSeat(seatId, seatBtn);
+                    rowDiv.appendChild(seatBtn);
+                }
+                
+                seatsGrid.appendChild(rowDiv);
+            }
+        }
+
+        function renderConcessions() {
+            const concessionsGrid = document.getElementById('concessionsGrid');
+            concessionsGrid.innerHTML = concessions.map(item => `
+                <div class="concession-card" id="concession_${item.id}" onclick="toggleConcession('${item.id}')">
+                    <div class="concession-icon">${item.icon}</div>
+                    <div class="concession-name">${item.name}</div>
+                    <div class="concession-price">$${item.price}</div>
+                    <div class="quantity-control">
+                        <button class="quantity-btn" onclick="event.stopPropagation(); changeQuantity('${item.id}', -1)">-</button>
+                        <span class="quantity-display" id="qty_${item.id}">0</span>
+                        <button class="quantity-btn" onclick="event.stopPropagation(); changeQuantity('${item.id}', 1)">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleSeat(seatId, element) {
+            const index = selectedSeats.indexOf(seatId);
+            if (index > -1) {
+                selectedSeats.splice(index, 1);
+                element.classList.remove('selected');
+            } else {
+                selectedSeats.push(seatId);
+                element.classList.add('selected');
+            }
+            updateBookingSummary();
+        }
+
+        function toggleConcession(itemId) {
+            const concession = concessions.find(c => c.id === itemId);
+            if (!concession) return;
+
+            if (!selectedConcessions[itemId]) {
+                selectedConcessions[itemId] = { ...concession, quantity: 1 };
+            } else {
+                if (selectedConcessions[itemId].quantity === 0) {
+                    selectedConcessions[itemId].quantity = 1;
+                } else {
+                    selectedConcessions[itemId].quantity = 0;
+                }
+            }
+
+            updateConcessionsDisplay();
+            updateBookingSummary();
+        }
+
+        function changeQuantity(itemId, delta) {
+            if (!selectedConcessions[itemId]) {
+                selectedConcessions[itemId] = { ...concessions.find(c => c.id === itemId), quantity: 0 };
+            }
+
+            const newQuantity = selectedConcessions[itemId].quantity + delta;
+            if (newQuantity >= 0 && newQuantity <= 10) {
+                selectedConcessions[itemId].quantity = newQuantity;
+            }
+
+            updateConcessionsDisplay();
+            updateBookingSummary();
+        }
+
+        function updateConcessionsDisplay() {
+            Object.keys(selectedConcessions).forEach(itemId => {
+                const quantity = selectedConcessions[itemId].quantity;
+                document.getElementById(`qty_${itemId}`).textContent = quantity;
+                
+                const concessionElement = document.getElementById(`concession_${itemId}`);
+                if (quantity > 0) {
+                    concessionElement.classList.add('selected');
+                } else {
+                    concessionElement.classList.remove('selected');
+                }
+            });
+        }
+
+        function updateBookingSummary() {
+            const ticketPrice = selectedSeats.length * 12;
+            const concessionsPrice = Object.values(selectedConcessions)
+                .filter(concession => concession.quantity > 0)
+                .reduce((total, concession) => total + (concession.price * concession.quantity), 0);
+            
+            let discount = 0;
+            if (appliedPromo) {
+                const subtotal = ticketPrice + concessionsPrice;
+                discount = calculateDiscount(subtotal, appliedPromo);
+                document.getElementById('discountRow').style.display = 'flex';
+                document.getElementById('discountAmount').textContent = `-$${discount}`;
+            } else {
+                document.getElementById('discountRow').style.display = 'none';
+            }
+            
+            const total = ticketPrice + concessionsPrice - discount;
+            
+            document.getElementById('selectedSeatsDisplay').textContent = selectedSeats.length > 0 ? selectedSeats.join(', ') : 'None';
+            document.getElementById('ticketPrice').textContent = `$${ticketPrice}`;
+            document.getElementById('concessionsPrice').textContent = `$${concessionsPrice}`;
+            document.getElementById('totalPrice').textContent = `$${total}`;
+        }
+
+        function calculateDiscount(subtotal, promo) {
+            if (promo.type === 'percentage') {
+                return Math.min(subtotal * (promo.discount / 100), promo.maxDiscount || Infinity);
+            } else {
+                return Math.min(promo.discount, subtotal);
+            }
+        }
+
+        function applyPromoCode() {
+            const code = document.getElementById('promoCode').value.trim().toUpperCase();
+            const promo = cinemaData.validatePromoCode(code);
+            
+            if (promo) {
+                appliedPromo = promo;
+                alert(`Promo code applied: ${promo.description}`);
+                updateBookingSummary();
+            } else {
+                alert('Invalid promo code');
+                appliedPromo = null;
+                updateBookingSummary();
+            }
+        }
+
+        function confirmBooking() {
+            if (selectedSeats.length === 0) {
+                alert('Please select at least one seat');
+                return;
+            }
+
+            if (!currentUser) {
+                alert('Please sign in to book tickets');
+                closeModal('bookingModal');
+                openAuth();
+                return;
+            }
+
+            alert(`Booking confirmed for ${selectedSeats.length} seat(s) for "${currentBooking.movie}"!`);
+            resetBooking();
+            closeModal('bookingModal');
+        }
+
+        function resetBooking() {
+            selectedSeats = [];
+            selectedConcessions = {};
+            appliedPromo = null;
+            currentBooking = null;
+            document.getElementById('promoCode').value = '';
+            updateBookingSummary();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function openAuth() {
+            document.getElementById('authModal').classList.add('active');
+        }
+
+        function showLogin() {
+            document.getElementById('authTitle').textContent = 'Sign In';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        }
+
+        function showRegister() {
+            document.getElementById('authTitle').textContent = 'Sign Up';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                alert('Please enter username and password');
+                return;
+            }
+            
+            // Simple login logic (in production, this would be server-side)
+            const users = JSON.parse(localStorage.getItem('cinemaUsers') || '{}');
+            if (users[username] && users[username].password === password) {
+                currentUser = username;
+                localStorage.setItem('loggedInUser', username);
+                updateAuthUI();
+                closeModal('authModal');
+                alert(`Welcome back, ${username}!`);
+            } else {
+                alert('Invalid username or password');
+            }
+        }
+
+        function register() {
+            const username = document.getElementById('regUsername').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            
+            if (!username || !email || !password || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            if (password.length < 4) {
+                alert('Password must be at least 4 characters');
+                return;
+            }
+            
+            // Simple registration logic
+            const users = JSON.parse(localStorage.getItem('cinemaUsers') || '{}');
+            if (users[username]) {
+                alert('Username already exists');
+                return;
+            }
+            
+            users[username] = { password, email, registeredAt: new Date().toISOString() };
+            localStorage.setItem('cinemaUsers', JSON.stringify(users));
+            
+            currentUser = username;
+            localStorage.setItem('loggedInUser', username);
+            updateAuthUI();
+            closeModal('authModal');
+            alert(`Welcome to Cinema Finder, ${username}!`);
+        }
+
+        function updateAuthUI() {
+            const navActions = document.querySelector('.nav-actions');
+            if (currentUser) {
+                navActions.innerHTML = `
+                    <span style="color: var(--neutral-700); font-weight: var(--font-medium);">
+                        Hi, ${currentUser}
+                    </span>
+                    <a href="profile.html" class="btn btn-ghost">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <button class="btn btn-outline" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </button>
+                `;
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('loggedInUser');
+            location.reload();
+        }
+
+        function toggleSearch() {
+            // Focus on search input
+            document.getElementById('mainSearch').focus();
+        }
+
+        // Test function for debugging
+        function testSearch() {
+            console.log('Testing search functionality...');
+            if (cinemaData && cinemaData.movies) {
+                const movieTitles = cinemaData.movies.map(m => m.title);
+                console.log('Available movies:', movieTitles);
+                console.log('Testing search for "Dune":', searchContent('Dune').length, 'results');
+                console.log('Testing search for "Barbie":', searchContent('Barbie').length, 'results');
+                console.log('Testing search for "Oppenheimer":', searchContent('Oppenheimer').length, 'results');
+            } else {
+                console.error('cinemaData or movies not available');
+            }
+        }
+
+        function setupEventListeners() {
+            // Search on Enter key
+            document.getElementById('mainSearch').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Close modals on outside click
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('active');
+                    }
+                });
+            });
+            
+            // Run test after initialization
+            setTimeout(testSearch, 1000);
+        }
+    </script>
+</body>
+</html>
